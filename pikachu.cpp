@@ -54,6 +54,7 @@ void draw_board(char a[][MAX], int m, int n)
         }
         cout << endl;
     }
+    cout << "abc" << endl;
 }
 
 bool is_valid_path(char board[][MAX], int m, int n, int r1, int c1, int r2, int c2, int max_turns, int num_turns) {
