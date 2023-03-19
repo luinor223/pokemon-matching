@@ -16,13 +16,13 @@ void make_board(char board[][MAX], int& m, int& n) {
     char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
     int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
 
-    std::vector<std::pair<int, int>> avail_pos;
+    vector<pair<int, int>> avail_pos;
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             if (i == 0 || j == 0 || i == m - 1 || j == n - 1) {
                 board[i][j] = '#';
             } else {
-                avail_pos.push_back(std::make_pair(i, j));
+                avail_pos.push_back(make_pair(i, j));
             }
         }
     }
