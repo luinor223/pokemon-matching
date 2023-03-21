@@ -40,16 +40,16 @@ void make_board(char board[][MAX], int& m, int& n) {
 void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char cellColumnChar, char** background, int mb, int nb)
 {
     int current_bgx = 0, current_bgy = 0;
-    // for (int i = 0; i < (mb - m * cellSize)/2; i++)
-    // {
-    //     for (int j = 0; j < nb; j++)
-    //     {
-    //         cout << background[i][j];
-    //         current_bgy = j;
-    //     }
-    //     current_bgx = i;
-    //     cout << endl;
-    // }
+    for (int i = 0; i < (mb - m * cellSize)/2; i++)
+    {
+        for (int j = 0; j < nb; j++)
+        {
+            cout << background[i][j];
+            current_bgy = j;
+        }
+        current_bgx = i;
+        cout << endl;
+    }
 
     for (int i = 0; i < m; i++)
     {

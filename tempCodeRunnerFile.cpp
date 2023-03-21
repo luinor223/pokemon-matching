@@ -1,5 +1,10 @@
-for(int j = 0; j < (nb - n*(cellSize + 2)) / 2; j++)  //Xuất background bên trái của hàng
+for (int i = 0; i < (mb - m * cellSize)/2; i++)
+    {
+        for (int j = 0; j < nb; j++)
         {
-            cout << background[current_bgx][j];
+            cout << background[i][j];
             current_bgy = j;
         }
+        current_bgx = i;
+        cout << endl;
+    }
