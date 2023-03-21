@@ -3,8 +3,6 @@
 
 void make_board(char board[][MAX], int& m, int& n) {
     srand(time(NULL));
-    m = 8;
-    n = 8;
     char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
     int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
 
@@ -36,46 +34,170 @@ void make_board(char board[][MAX], int& m, int& n) {
 //Display board to the monitor (cellSize must be odd)
 void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char cellColumnChar, char** background, int mb, int nb)
 {
-
-    for (int i = 0; i < m; i++){
-        for (int j = 0; j < (cellSize+2)*n; j++)    //##########
-            cout << cellColumnChar;
-        cout << endl;
-
-        for (int j = 0; j < n; j++) //#         #
+    int current_bgx, current_bgy;
+    for (int i = 0; i < (mb - m * cellSize)/2; i++)
+    {
+        for (int j = 0; j < nb; j++)
         {
-            cout << cellRowChar;
-            for (int k = 0; k < cellSize; k++)
-                cout << " ";
-            cout << cellRowChar;
+            cout << background[i][j];
+            current_bgy = j;
         }
+        current_bgx = i;
         cout << endl;
+    }
 
-        for (int j = 0; j < n; j++)  //#    char   #
+    for (int i = 0; i < m; i++)
+    {
+        //Hàng đầu tiên của cell
+        current_bgx ++;
+        for(int j = 0; j < (nb - n*(cellSize + 2)) / 2; j++)  //Xuất background bên trái của hàng
         {
-            cout << cellRowChar;
-            for (int k = 0; k < (cellSize - 1)/2; k++)
-                cout << " ";
-
-            cout << a[i][j];    
-
-            for (int k = 0; k < (cellSize - 1)/2; k++)
-                cout << " ";
-            cout << cellRowChar;
+            cout << background[current_bgx][j];
+            current_bgy = j;
         }
-        cout << endl;
-
-        for (int j = 0; j < n; j++) //#         #
+        for (int j = 0; j < n; j++)    //Xuất hàng cuối của cell: -------
         {
-            cout << cellRowChar;
-            for (int k = 0; k < cellSize; k++)
-                cout << " ";
-            cout << cellRowChar;
+            if(a[i][j] != '\0')
+            {
+                for(int k = 0; k < cellSize + 2; k++)
+                    cout << cellColumnChar;
+            }
+            else
+            {
+                for (int k = 0; k < (cellSize+2); k++)
+                {
+                    cout << background[current_bgx][current_bgy++];
+                }   
+            }
         }
+        for (int j = (nb + n*(cellSize + 2)) / 2; j < nb; j++) //Xuất background bên phải của hàng
+            cout << background[current_bgx][j];
         cout << endl;
 
-        for (int j = 0; j < (cellSize+2)*n; j++)    //##########
-            cout << cellColumnChar;
+        //Hàng thứ 2 của cell
+        current_bgx ++;
+        for(int j = 0; j < (nb - n*(cellSize + 2)) / 2; j++) //Xuất background bên trái của hàng
+        {
+            cout << background[current_bgx][j];
+            current_bgy = j+1;
+        }
+        for (int j = 0; j < n; j++) //Xuất hàng thứ 2 của cell: |         |
+        {
+            if (a[i][j] != '\0')
+            {
+                cout << cellRowChar;
+                for (int k = 0; k < cellSize; k++)
+                    cout << " ";
+                cout << cellRowChar;
+            }
+            else
+            {
+                for (int k = 0; k < (cellSize+2); k++)
+                {
+                    cout << background[current_bgx][current_bgy++];
+                }   
+            }
+        }
+        for (int j = (nb + n*(cellSize + 2)) / 2; j < nb; j++) //Xuất background bên phải của hàng
+            cout << background[current_bgx][j];
+        cout << endl;
+
+        //Hàng thứ 3 của cell
+        current_bgx ++;
+        for(int j = 0; j < (nb - n*(cellSize + 2)) / 2; j++) //Xuất background bên trái của hàng
+        {
+            cout << background[current_bgx][j];
+            current_bgy = j+1;
+        }
+        for (int j = 0; j < n; j++)  //Xuất hàng giữa (có chứa kí tự) của cell: |    char   |
+        {
+            if(a[i][j] != '\0')
+            {
+                cout << cellRowChar;
+                for (int k = 0; k < (cellSize - 1)/2; k++)
+                    cout << " ";
+
+                cout << a[i][j];    
+
+                for (int k = 0; k < (cellSize - 1)/2; k++)
+                    cout << " ";
+                cout << cellRowChar;
+            }
+            else
+            {
+                for (int k = 0; k < (cellSize+2); k++)
+                {
+                    cout << background[current_bgx][current_bgy++];
+                }
+            }
+            
+        }
+        for (int j = (nb + n*(cellSize + 2)) / 2; j < nb; j++) //Xuất background bên phải của hàng
+            cout << background[current_bgx][j];
+        cout << endl;
+        
+        //Hàng kề cuối của cell
+        current_bgx ++;
+        for(int j = 0; j < (nb - n*(cellSize + 2)) / 2; j++) //Xuất background bên trái của hàng
+        {
+            cout << background[current_bgx][j];
+            current_bgy = j+1;
+        }
+        for (int j = 0; j < n; j++) //Xuất hàng kề cuối của cell: |         |
+        {
+            if (a[i][j] != '\0')
+            {
+                cout << cellRowChar;
+                for (int k = 0; k < cellSize; k++)
+                    cout << " ";
+                cout << cellRowChar;
+            }
+            else
+            {
+                for (int k = 0; k < (cellSize+2); k++)
+                {
+                    cout << background[current_bgx][current_bgy++];
+                }   
+            }
+        }
+        for (int j = (nb + n*(cellSize + 2)) / 2; j < nb; j++) //Xuất background bên phải của hàng
+            cout << background[current_bgx][j];
+        cout << endl;
+
+        //Hàng cuối cùng của cell
+        current_bgx ++;
+        for(int j = 0; j < (nb - n*(cellSize + 2)) / 2; j++) //Xuất background bên trái của hàng
+        {
+            cout << background[current_bgx][j];
+            current_bgy = j+1;
+        }
+        for (int j = 0; j < n; j++)    //Xuất hàng cuối của cell: -------
+        {
+            if(a[i][j] != '\0')
+            {
+                for(int k = 0; k < cellSize + 2; k++)
+                    cout << cellColumnChar;
+            }
+            else
+            {
+                for (int k = 0; k < (cellSize+2); k++)
+                {
+                    cout << background[current_bgx][current_bgy++];
+                }   
+            }
+        }
+        for (int j = (nb + n*(cellSize + 2)) / 2; j < nb; j++) //Xuất background bên phải của hàng
+            cout << background[current_bgx][j];
+        cout << endl;
+    }
+
+    current_bgx++;
+    for (int i = current_bgx; i < mb; i++)
+    {
+        for (int j = 0; j < nb; j++)
+        {
+            cout << background[i][j];
+        }
         cout << endl;
     }
 }
@@ -83,7 +205,7 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
 int main()
 {
     char board[MAX][MAX];
-    int row, column;
+    int row = 8, column = 8;
     int cellSize = 5;
     char cellRowChar = '|';
     char cellColumnChar = '-';
@@ -91,12 +213,27 @@ int main()
 
     char** background;
     int bg_row = row, bg_column = column;
+
+    // background = new char *[5*(bg_row+2)];
+    // for (int i = 0; i < 5 * (bg_row + 2); i++)
+    //     background[i] = new char[7 * (bg_column + 2)];
     
     getFileContent(background, bg_row, bg_column);
 
-    showBoard(board, row, column, cellSize, cellRowChar, cellColumnChar, background, bg_row, bg_column);
+    int max_turns = 5;
+    int turn = 0;
+    while (turn < max_turns)
+    {
+        showBoard(board, row, column, cellSize, cellRowChar, cellColumnChar, background, bg_row, bg_column);
+    
+        cout << "Nhap o muon xoa: ";
+        int x, y;
+        cin >> x >> y;
+        board[x][y] = '\0';
+    }
 
     deleteBg(row, column, background);
 
     return 0;
 }
+

@@ -8,24 +8,23 @@ void deleteBg(int m, int n, char **&background){
 
 void getFileContent(char **&background, int &m, int &n)
 {
-    ifstream File("background.txt");
+    ifstream File("art.txt");
     string result = "";
 
     background = new char *[5*(m+2)];
-    for (int i = 0; i < 5 * (m + 2); i++)
-        background[i] = new char[7 * (n + 2)];
 
     int i = 0;
     int max = 0;
     if (File.is_open())
     {
-        while(File.good())
+        while(File.good() && i < 5*(m+2) - 1)
         {
             string tempLine;
             getline(File, tempLine);
+            background[i] = new char[tempLine.length() + 1];
             strcpy(background[i], tempLine.c_str());
-            if (max < strlen(background[i]))
-                max = strlen(background[i]);
+            if (max < tempLine.length())
+                max = tempLine.length();
             //cout << background[i] << endl;
             i++;
         }
@@ -44,7 +43,7 @@ void getFileContent(char **&background, int &m, int &n)
 // {
 //     char** background;
 //     int m = 8, n = 8;
-//     int mb, nb;
+//     int mb = m, nb = n;
 //     background = new char *[5*(m+2)];
 //     for (int i = 0; i < 5 * (m + 2); i++)
 //         background[i] = new char[7 * (n + 2)];
@@ -59,7 +58,7 @@ void getFileContent(char **&background, int &m, int &n)
 //         cout << endl;
 //     }
 
-//     deleteArt(m, n, background);
+//     deleteBg(m, n, background);
 
 //     return 0;
 // }
