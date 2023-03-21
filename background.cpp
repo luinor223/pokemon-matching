@@ -8,7 +8,7 @@ void deleteBg(int m, int n, char **&background){
 
 void getFileContent(char **&background, int &m, int &n)
 {
-    ifstream File("art.txt");
+    ifstream File("background.txt");
     string result = "";
 
     background = new char *[5*(m+2)];

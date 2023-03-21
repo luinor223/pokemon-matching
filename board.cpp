@@ -205,7 +205,7 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
 int main()
 {
     char board[MAX][MAX];
-    int row = 8, column = 8;
+    int row = 4, column = 4;
     int cellSize = 5;
     char cellRowChar = '|';
     char cellColumnChar = '-';
@@ -220,7 +220,7 @@ int main()
     
     getFileContent(background, bg_row, bg_column);
 
-    int max_turns = 5;
+    int max_turns = 20;
     int turn = 0;
     while (turn < max_turns)
     {
@@ -230,6 +230,7 @@ int main()
         int x, y;
         cin >> x >> y;
         board[x][y] = '\0';
+        turn;
     }
 
     deleteBg(row, column, background);
