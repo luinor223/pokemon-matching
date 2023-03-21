@@ -1,61 +1,49 @@
-#include <iostream>
-#include <ctime>
-#include <stdio.h>
-#include <vector>
-#include <math.h>
-#include <stack>
+// formatBoard(board[SIZE][SIZE], int cellSize, int backGroundSize, char cellOutLineChar)
+// {
+// 	NOTE : cellSize*SIZE < backGroundSize  
+// 	  EX : 
+// 	board = {A, B}
+// 			{A, B}
+// 	cellSize = 5
+// 	backGroundSize = 15
+// 	cellOutLineChar = *
+// 	###############
+// 	###############
+// 	###############
+// 	###**********##
+// 	###*   **   *##
+// 	###* A ** B *##
+// 	###*   **   *##
+// 	###**********##
+// 	###**********##
+// 	###*   **   *##
+// 	###* A ** B *##
+// 	###*   **   *##
+// 	###**********##
+// 	###############
+// 	###############
 
-#define MAX 100
+// }
+// void draw_board(char a[][MAX], int m, int n)
+// {
+//     char backGroundChar = '#';
+//     int box_row = cellSize + 2;
+//     int box_column = cellSize;
+//     int backGroundSize_row = max(m, n) * cellSize + 10;
+//     int backGroundSize_column = max(m, n) * cellSize + 8;
 
-using namespace std;
+//     for (int i = 0; i <= (backGroundSize_row -  max(m, n) * cellSize) / 2 ; i++)
+//         for (int i = 0; i < backGroundSize_column; i++)
+//             cout << backGroundChar;
 
-void make_board(char board[][MAX], int& m, int& n) {
-    srand(time(NULL));
-    m = 8;
-    n = 8;
-    char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
-    int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
-
-    std::vector<std::pair<int, int>> avail_pos;
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            if (i == 0 || j == 0 || i == m - 1 || j == n - 1) {
-                board[i][j] = '#';
-            } else {
-                avail_pos.push_back(std::make_pair(i, j));
-            }
-        }
-    }
-    const int pairs = avail_pos.size() / 2;
-    for (int i = 0; i < pairs; i++) {
-        char c = alphabet[rand() % alphabet_size];
-
-        int pos1 = rand() % avail_pos.size();
-        int pos2 = rand() % avail_pos.size();
-        while (pos1 == pos2) { // if same position is selected
-            pos2 = rand() % avail_pos.size(); // select next position
-        }
-
-        board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
-        board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
-
-        avail_pos.erase(avail_pos.begin() + max(pos1, pos2));
-
-        avail_pos.erase(avail_pos.begin() + min(pos1, pos2));
-    }
-}
-
-
-void draw_board(char a[][MAX], int m, int n)
-{
-    for (int i = 0; i < m; i++) {
-        for (int j = 0 ; j < n; j++) {
-            cout << a[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << "abc" << endl;
-}
+    
+//     for (int i = 0; i < m; i++) {
+//         for (int j = 0 ; j < n; j++) {
+//             cout << a[i][j] << " ";
+//         }
+//         cout << endl;
+//     }
+// }
 
 bool is_valid_path(char board[][MAX], int m, int n, int r1, int c1, int r2, int c2, int max_turns, int num_turns) {
     if (r1 < 0 || r1 >= m || c1 < 0 || c1 >= n || r2 < 0 || r2 >= m || c2 < 0 || c2 >= n) {
@@ -129,7 +117,7 @@ void play_game(char board[][MAX], int m, int n)
     int max_turns = 3;
     while (num_turns < max_turns) {
         // Draw the updated board
-        draw_board(board, m, n);
+        showBoard(board, m, n, 5, '|', '-');
 
         // Get the user's input for the first tile
         pair<int, int> tile1_pos;
@@ -156,9 +144,3 @@ void play_game(char board[][MAX], int m, int n)
     }
 }
 
-int main()
-{
-    char board[MAX][MAX];
-    int row, column;
-    make_board(board, row, column);
-    play_game(board, row, column);

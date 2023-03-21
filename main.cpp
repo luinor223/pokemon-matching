@@ -42,43 +42,6 @@ void clear()
 	system("cls");
 }
 
-void make_board(char board[][SIZE][SIZE], int m, int n) {
-    srand(time(NULL));
-    m = SIZE;
-    n = SIZE;
-    char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
-    int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
-
-    vector<pair<int, int>> avail_pos;
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            if (i == 0 || j == 0 || i == m - 1 || j == n - 1) {
-                board[0][i][j] = '#';
-            } else {
-                avail_pos.push_back(make_pair(i, j));
-            }
-        }
-    }
-    const int pairs = avail_pos.size() / 2;
-    for (int i = 0; i < pairs; i++) {
-        char c = alphabet[rand() % alphabet_size];
-
-        int pos1 = rand() % avail_pos.size();
-        int pos2 = rand() % avail_pos.size();
-        while (pos1 == pos2) { // if same position is selected
-            pos2 = rand() % avail_pos.size(); // select next position
-        }
-
-        board[1][avail_pos[pos1].first][avail_pos[pos1].second] = c;
-        board[1][avail_pos[pos2].first][avail_pos[pos2].second] = c;
-
-        avail_pos.erase(avail_pos.begin() + max(pos1, pos2));
-
-        avail_pos.erase(avail_pos.begin() + min(pos1, pos2));
-    }
-}
-
-
 void displayBoard()
 {
     for (int i = 0; i < SIZE; i++){
@@ -146,14 +109,13 @@ void getInput()
 int main()
 {
     cout << "This is some \033[7mhighlighted\033[0m text.\n";
-    make_board(board, SIZE, SIZE);
     // INIT MAP
-    // for (int i = 0; i < SIZE; i++)
-    //     for (int j = 0; j < SIZE; j++)
-    //     {
-    //         board[0][i][j] = deathIcon;
-    //         board[1][i][j] = aliveIcon;
-    //     }
+    for (int i = 0; i < SIZE; i++)
+        for (int j = 0; j < SIZE; j++)
+        {
+            board[0][i][j] = deathIcon;
+            board[1][i][j] = aliveIcon;
+        }
     for (int i = 0; i < SIZE; i++)
         for (int j = 0; j < SIZE; j++)
             state[i][j] = 0;
