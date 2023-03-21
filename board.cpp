@@ -8,8 +8,14 @@ void make_board(char board[][MAX], int& m, int& n) {
 
     std::vector<std::pair<int, int>> avail_pos;
     for (int i = 0; i < m; i++) 
-        for (int j = 0; j < n; j++) 
+        for (int j = 0; j < n; j++)
+        {
+            if (i==0 || j == 0 || i == m - 1 || j == n - 1)
+                board[i][j] = '\0';
+            else
                 avail_pos.push_back(std::make_pair(i, j));
+        } 
+                
 
     const int pairs = avail_pos.size() / 2;
     for (int i = 0; i < pairs; i++) {
@@ -30,21 +36,20 @@ void make_board(char board[][MAX], int& m, int& n) {
     }
 }
 
-//, char** background, int mb, int nb
 //Display board to the monitor (cellSize must be odd)
 void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char cellColumnChar, char** background, int mb, int nb)
 {
-    int current_bgx, current_bgy;
-    for (int i = 0; i < (mb - m * cellSize)/2; i++)
-    {
-        for (int j = 0; j < nb; j++)
-        {
-            cout << background[i][j];
-            current_bgy = j;
-        }
-        current_bgx = i;
-        cout << endl;
-    }
+    int current_bgx = 0, current_bgy = 0;
+    // for (int i = 0; i < (mb - m * cellSize)/2; i++)
+    // {
+    //     for (int j = 0; j < nb; j++)
+    //     {
+    //         cout << background[i][j];
+    //         current_bgy = j;
+    //     }
+    //     current_bgx = i;
+    //     cout << endl;
+    // }
 
     for (int i = 0; i < m; i++)
     {
@@ -191,6 +196,7 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
         cout << endl;
     }
 
+    //In hàng dưới (còn lại) của background
     current_bgx++;
     for (int i = current_bgx; i < mb; i++)
     {
@@ -205,7 +211,7 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
 int main()
 {
     char board[MAX][MAX];
-    int row = 4, column = 4;
+    int row = 6, column = 8;
     int cellSize = 5;
     char cellRowChar = '|';
     char cellColumnChar = '-';
@@ -213,12 +219,8 @@ int main()
 
     char** background;
     int bg_row = row, bg_column = column;
-
-    // background = new char *[5*(bg_row+2)];
-    // for (int i = 0; i < 5 * (bg_row + 2); i++)
-    //     background[i] = new char[7 * (bg_column + 2)];
     
-    getFileContent(background, bg_row, bg_column);
+    getFileContent(background, bg_row, bg_column, cellSize);
 
     int max_turns = 20;
     int turn = 0;
