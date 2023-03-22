@@ -6,7 +6,7 @@
 #include <thread>
 #include <queue>
 
-
+#include "board.cpp"
 using namespace std;
 
 #define SIZE 12
@@ -16,9 +16,6 @@ bool isSelected[SIZE][SIZE];
 char** board;
 int row, col;
 bool canMatch = false;
-
-int dx[] = {-1, 1, 0, 0}, // UP DOWN LEFT RIGHT
-    dy[] = {0, 0, -1, 1};
 
 struct Point{
     int x, y;
@@ -95,68 +92,68 @@ void make_board(){
     }
 }
 
-void DFS(Point curPoint, Point destination, int turnNum, vector <string> result, bool visited[][SIZE])
-{
-    clear();
-    if (turnNum > 2 || canMatch == true)
-        return;
-    visited[curPoint.x+1][curPoint.y+1] = true;
-    for (int i = 0; i < row+2; i++){
-        for (int j = 0; j < col+2; j++)
-            cout << visited[i][j];
-        cout << endl;
-    }   
-    cout << endl;
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    if (curPoint.x == destination.x && curPoint.y == destination.y)
-    {
-        canMatch = true;
-        for (int i = 0; i < result.size(); i++)
-            cout << result[i] << " ";
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-        return;
-    }
-    for (int i = 0; i < 4; i++)
-    {
-        Point newPos;
-        newPos.x = curPoint.x + dx[i];
-        newPos.y = curPoint.y + dy[i];
+// void DFS(Point curPoint, Point destination, int turnNum, vector <string> result, bool visited[][SIZE])
+// {
+//     clear();
+//     if (turnNum > 2 || canMatch == true)
+//         return;
+//     visited[curPoint.x+1][curPoint.y+1] = true;
+//     for (int i = 0; i < row+2; i++){
+//         for (int j = 0; j < col+2; j++)
+//             cout << visited[i][j];
+//         cout << endl;
+//     }   
+//     cout << endl;
+//     this_thread::sleep_for(chrono::seconds(1));
+//     if (curPoint.x == destination.x && curPoint.y == destination.y)
+//     {
+//         canMatch = true;
+//         for (int i = 0; i < result.size(); i++)
+//             cout << result[i] << " ";
+//         this_thread::sleep_for(chrono::seconds(3));
+//         return;
+//     }
+//     for (int i = 0; i < 4; i++)
+//     {
+//         Point newPos;
+//         newPos.x = curPoint.x + dx[i];
+//         newPos.y = curPoint.y + dy[i];
 
-        if (isInMap(newPos.x+1, newPos.y+1) && visited[newPos.x+1][newPos.y+1] == false)
-        {
-            string direction;
-            switch (i){
-                case 0:
-                    direction = "UP";
-                    break;
-                case 1:
-                    direction = "DOWN";
-                    break;
-                case 2:
-                    direction = "LEFT";
-                    break;
-                case 3:
-                    direction = "RIGHT";
-                    break;
-            }
-            result.push_back(direction);
-            if (result.size() > 0 && direction != result[result.size()-1])
-            {   
-                cout << "newTurn" << endl;
-                turnNum++;
-            }
-            DFS(newPos, destination, turnNum, result, visited);
-            visited[curPoint.x+1][curPoint.y+1] = false;      
-            result.pop_back();   
-        }
-    }
- 
-}
+//         if (isInMap(newPos.x+1, newPos.y+1) && visited[newPos.x+1][newPos.y+1] == false)
+//         {
+//             string direction;
+//             switch (i){
+//                 case 0:
+//                     direction = "UP";
+//                     break;
+//                 case 1:
+//                     direction = "DOWN";
+//                     break;
+//                 case 2:
+//                     direction = "LEFT";
+//                     break;
+//                 case 3:
+//                     direction = "RIGHT";
+//                     break;
+//             }
+//             result.push_back(direction);
+//             if (result.size() > 0 && direction != result[result.size()-1])
+//             {   
+//                 cout << "newTurn" << endl;
+//                 turnNum++;
+//             }
+//             DFS(newPos, destination, turnNum, result, visited);
+//             visited[curPoint.x+1][curPoint.y+1] = false;      
+//             result.pop_back();   
+//         }
+//     }
+
+// }
 
 vector<pair<int, int>> findPath(int _x, int _y, int x, int y)
 {
 	//INIT Graph
-	std::vector<std::vector<int>> e(row + 2, vector<int>(col+ 2, 0));
+	vector<vector<int>> e(row + 2, vector<int>(col+ 2, 0));
 	for (int i = 0; i < row; ++i)
 	{
 		for (int j = 0; j < col; ++j)
@@ -173,18 +170,18 @@ vector<pair<int, int>> findPath(int _x, int _y, int x, int y)
 	queue<pair<int, int>> q;
 	vector<vector<pair<int, int>>> trace(e.size(), vector<pair<int, int>>(e[0].size(), make_pair(-1, -1)));
 	q.push(t);
-	trace[t.first][t.second] = std::make_pair(-2, -2);
+	trace[t.first][t.second] = make_pair(-2, -2);
 	e[s.first][s.second] = 0;
 	e[t.first][t.second] = 0;
 	while (!q.empty()) {
-		auto u = q.front();
+		pair <int, int> u = q.front();
 		q.pop();
 		if (u == s) break;
 		for (int i = 0; i < 4; ++i) {
 			int x = u.first + dx[i];
 			int y = u.second + dy[i];
 			while (x >= 0 && x < e.size() && y >= 0 && y < e[0].size() && e[x][y] == 0) {
-				if (trace[x][y].first == -1) {
+				if (trace[x][y].first == -1){
 					trace[x][y] = u;
 					q.push({ x, y });
 				}
@@ -242,20 +239,20 @@ void checkMatching()
     res = findPath(s.x, s.y, f.x, f.y);
     for (int i = 0; i < res.size(); i++)
         cout << res[i].first << " " << res[i].second << endl;
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    this_thread::sleep_for(chrono::seconds(3));
     // vector <string> result;
     // DFS(s, f, 0, result , visited);
     // for (int i = 0; i < row+2; i++)
     //     delete visited[i];
     
     // delete visited;
-    if (canMatch)
+    if (res.size() <= 4 && res.size() >= 2)
     {
         board[s.x][s.y] = '~';
         board[f.x][f.y] = '~';
         occupied[s.x+1][s.y+1] = false;
         occupied[f.x+1][f.y+1] = false;
-        canMatch = false;
+        //canMatch = false;
     }
     isSelected[s.x][s.y] = false;
     isSelected[f.x][f.y] = false;
@@ -340,14 +337,15 @@ void getInput()
 
 int main()
 {
-
     init_board();
     make_board();
-
+    char** background;
+    int bg_row = row, bg_column = col;
     while (true)
     {
         checkMatching();
         displayBoard();
+        //showBoard(board, row, col, 5, '|', '-',  )
         getInput();
         
         clear();
