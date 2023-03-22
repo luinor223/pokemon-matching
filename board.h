@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include <vector>
 #include <math.h>
-#include <stack>
+#include <windows.h>
 
-#define MAX 100
 
-void make_board(char board[][MAX], int& m, int& n);
-void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char cellColumnChar, char** background, int mb, int nb);
+void make_board(char** &board, int m, int n);
+void showBoard(char** board, int row, int column, int cellSize, char** background, int bg_row, int bg_column);
+void deleteMemBoard(char** &board, int m, int n);
+void drawCell(char a, int x, int y, int cellSize, char cellRowChar = '|', char cellColumnChar = '-');

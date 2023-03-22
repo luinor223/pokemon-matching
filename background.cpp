@@ -2,9 +2,10 @@
 
 void getFileContent(char **&background, int &m, int &n, int cellSize)
 {
-    ifstream File("background.txt");
+    ifstream File("art.txt");
     string result = "";
 
+    
     background = new char *[cellSize*(m+2)];
 
     int i = 0;
@@ -29,6 +30,17 @@ void getFileContent(char **&background, int &m, int &n, int cellSize)
     {
         cout << "Error! File does not exist.";
         
+    }
+}
+
+void printBg(char** background, int bg_row, int bg_column)
+{
+    for(int i = 0; i < bg_row; i++)
+    {
+        for (int j = 0; j < bg_column; j++)
+            cout << background[i][j];
+        
+        cout << endl;
     }
 }
 
