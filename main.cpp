@@ -7,13 +7,17 @@
 #include <queue>
 
 #include "board.cpp"
+#include "console.cpp"
+#include "background.cpp"
+// #include "main.h"
+
 using namespace std;
 
 #define SIZE 12
 
 bool** occupied;
-bool isSelected[SIZE][SIZE];
 char** board;
+bool isSelected[SIZE][SIZE];
 int row, col;
 bool canMatch = false;
 
@@ -91,64 +95,6 @@ void make_board(){
         avail_pos.erase(avail_pos.begin() + min(pos1, pos2));
     }
 }
-
-// void DFS(Point curPoint, Point destination, int turnNum, vector <string> result, bool visited[][SIZE])
-// {
-//     clear();
-//     if (turnNum > 2 || canMatch == true)
-//         return;
-//     visited[curPoint.x+1][curPoint.y+1] = true;
-//     for (int i = 0; i < row+2; i++){
-//         for (int j = 0; j < col+2; j++)
-//             cout << visited[i][j];
-//         cout << endl;
-//     }   
-//     cout << endl;
-//     this_thread::sleep_for(chrono::seconds(1));
-//     if (curPoint.x == destination.x && curPoint.y == destination.y)
-//     {
-//         canMatch = true;
-//         for (int i = 0; i < result.size(); i++)
-//             cout << result[i] << " ";
-//         this_thread::sleep_for(chrono::seconds(3));
-//         return;
-//     }
-//     for (int i = 0; i < 4; i++)
-//     {
-//         Point newPos;
-//         newPos.x = curPoint.x + dx[i];
-//         newPos.y = curPoint.y + dy[i];
-
-//         if (isInMap(newPos.x+1, newPos.y+1) && visited[newPos.x+1][newPos.y+1] == false)
-//         {
-//             string direction;
-//             switch (i){
-//                 case 0:
-//                     direction = "UP";
-//                     break;
-//                 case 1:
-//                     direction = "DOWN";
-//                     break;
-//                 case 2:
-//                     direction = "LEFT";
-//                     break;
-//                 case 3:
-//                     direction = "RIGHT";
-//                     break;
-//             }
-//             result.push_back(direction);
-//             if (result.size() > 0 && direction != result[result.size()-1])
-//             {   
-//                 cout << "newTurn" << endl;
-//                 turnNum++;
-//             }
-//             DFS(newPos, destination, turnNum, result, visited);
-//             visited[curPoint.x+1][curPoint.y+1] = false;      
-//             result.pop_back();   
-//         }
-//     }
-
-// }
 
 vector<pair<int, int>> findPath(int _x, int _y, int x, int y)
 {
@@ -260,35 +206,6 @@ void checkMatching()
     selectedPoint.clear();
 }
 
-
-
-// void displayBoard()
-// {
-//     for (int i = 0; i < row; i++){
-//         for (int j = 0; j < col; j++)
-//         {
-//             if (i == cur.x && j == cur.y && isSelected[i][j])
-//                 cout << "\033[37;42m"; // escape sequence
-//             else if (i == cur.x && j == cur.y)
-//                 cout << "\033[7m"; // white background
-//             else if (isSelected[i][j])
-//                 cout << "\033[1;32m"; // green text
-
-//             cout << board[i][j] << "\033[0m ";
-//         }
-//         cout << endl;
-//     }
-//     cout << "Current Position : " << cur.x << " " << cur.y << endl;
-//     cout << "current select point :" << endl;
-//         for (int i = 0; i < selectedPoint.size(); i++)
-//             cout << selectedPoint[i].x << " " << selectedPoint[i].y << endl;
-//     for (int i = 0; i < row+2; i++){
-//         for (int j = 0; j < col+2; j++)
-//             cout << occupied[i][j];
-//         cout << endl;
-//     }
-// }
-// rand() & vector.size()a
 void getInput() 
 {
     char c = getch(); // get direct input
@@ -339,7 +256,7 @@ int main()
 {
     init_board();
     make_board();
-
+    SetWindowSize(400, 400);
     char** background;
     int bg_row = row, bg_column = col;
     getFileContent(background, bg_row, bg_column, 5);
@@ -348,8 +265,8 @@ int main()
     {
         checkMatching();
         //displayBoard();
-        showBoard(board, row, col, 5, background, bg_row, bg_column);
-//GoTo(50, 10);
+        showBoard(board, row, col, 5, background, bg_row, bg_column, cur.x, cur.y);
+        //GoTo(50, 10);
         cout << cur.x << " " << cur.y << endl;
         getInput();
         

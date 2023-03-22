@@ -1,6 +1,7 @@
 #include "board.h"
-#include "background.cpp"
-#include "console.cpp"
+#include "background.h"
+#include "console.h"
+// #include "main.h"
 
 void make_board(char** &board, int m, int n) {
     srand(time(NULL));
@@ -17,7 +18,7 @@ void make_board(char** &board, int m, int n) {
             if (i==0 || j == 0 || i == m - 1 || j == n - 1)
                 board[i][j] = '\0';
             else
-                avail_pos.push_back(std::make_pair(i, j));
+                avail_pos.push_back(make_pair(i, j));
         } 
     }  
 
@@ -48,7 +49,7 @@ void deleteMemBoard(char** &board, int m, int n)
     delete[] board;
 }
 
-void drawCell(char a, int x, int y, int cellSize, char cellRowChar = '|', char cellColumnChar = '-')
+void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellColumnChar, int backgroundColor, int textColor)
 {
     for (int i = 0; i < cellSize; i++)
     {
@@ -62,24 +63,35 @@ void drawCell(char a, int x, int y, int cellSize, char cellRowChar = '|', char c
             else if (i == j && i == cellSize / 2)
                 cout << a;
             else
+            {
+                SetColor(backgroundColor, textColor);
                 cout << " ";
+                SetColor(0, 7);
+            }
         }
     }
 }
 
-void showBoard(char** board, int row, int column, int cellSize, char** background, int bg_row, int bg_column)
+void showBoard(char** board, int row, int column, int cellSize, char** background, int bg_row, int bg_column, int curX, int curY)
 {
     GoTo(0, 0);
     printBg(background, bg_row, bg_column);
     int offset_x = (bg_row - row * cellSize) / 2;
     int offset_y = (bg_column - column*cellSize) / 2;
+    offset_x = (offset_x < 0) ? 0 : offset_x;
+    offset_y = (offset_y < 0) ? 0 : offset_y;
     GoTo(offset_x, offset_y);
     for (int i = 0; i < row; i++)
     {
         for (int j = 0; j < column; j++)
-        {
+        {         
             if(board[i][j] != '\0')
-                drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize);
+            {
+                if (curX == i && curY == j)
+                    drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize, 179, 196, 7, 0);
+                else
+                    drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize, 179, 196, 0, 0);
+            }
         }
     }
 }
