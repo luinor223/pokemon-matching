@@ -1,13 +1,16 @@
 #include "board.h"
 #include "background.cpp"
 
-void make_board(char board[][MAX], int& m, int& n) {
+void make_board(char** &board, int m, int n) {
     srand(time(NULL));
-    char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
+    char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L', 'K' , 'I'};
     int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
 
-    std::vector<std::pair<int, int>> avail_pos;
-    for (int i = 0; i < m; i++) 
+    board = new char *[m];
+    vector<pair<int, int>> avail_pos;
+    for (int i = 0; i < m; i++)
+    {
+        board[i] = new char[n]; 
         for (int j = 0; j < n; j++)
         {
             if (i==0 || j == 0 || i == m - 1 || j == n - 1)
@@ -15,7 +18,7 @@ void make_board(char board[][MAX], int& m, int& n) {
             else
                 avail_pos.push_back(std::make_pair(i, j));
         } 
-                
+    }  
 
     const int pairs = avail_pos.size() / 2;
     for (int i = 0; i < pairs; i++) {
@@ -36,8 +39,16 @@ void make_board(char board[][MAX], int& m, int& n) {
     }
 }
 
+void deleteMemBoard(char** &board, int m, int n)
+{
+    for (int i = 0; i < m; i++)
+        delete[] board[i];
+    
+    delete[] board;
+}
+
 //Display board to the monitor (cellSize must be odd)
-void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char cellColumnChar, char** background, int mb, int nb)
+void showBoard(char** board, int m, int n, int cellSize, char cellRowChar, char cellColumnChar, char** background, int mb, int nb)
 {
     int current_bgx = 0, current_bgy = 0;
     for (int i = 0; i < (mb - m * cellSize)/2; i++)
@@ -62,7 +73,7 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
         }
         for (int j = 0; j < n; j++)    //Xuất hàng cuối của cell: -------
         {
-            if(a[i][j] != '\0')
+            if(board[i][j] != '\0')
             {
                 for(int k = 0; k < cellSize + 2; k++)
                     cout << cellColumnChar;
@@ -88,7 +99,7 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
         }
         for (int j = 0; j < n; j++) //Xuất hàng thứ 2 của cell: |         |
         {
-            if (a[i][j] != '\0')
+            if (board[i][j] != '\0')
             {
                 cout << cellRowChar;
                 for (int k = 0; k < cellSize; k++)
@@ -116,13 +127,13 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
         }
         for (int j = 0; j < n; j++)  //Xuất hàng giữa (có chứa kí tự) của cell: |    char   |
         {
-            if(a[i][j] != '\0')
+            if(board[i][j] != '\0')
             {
                 cout << cellRowChar;
                 for (int k = 0; k < (cellSize - 1)/2; k++)
                     cout << " ";
 
-                cout << a[i][j];    
+                cout << board[i][j];    
 
                 for (int k = 0; k < (cellSize - 1)/2; k++)
                     cout << " ";
@@ -150,7 +161,7 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
         }
         for (int j = 0; j < n; j++) //Xuất hàng kề cuối của cell: |         |
         {
-            if (a[i][j] != '\0')
+            if (board[i][j] != '\0')
             {
                 cout << cellRowChar;
                 for (int k = 0; k < cellSize; k++)
@@ -178,7 +189,7 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
         }
         for (int j = 0; j < n; j++)    //Xuất hàng cuối của cell: -------
         {
-            if(a[i][j] != '\0')
+            if(board[i][j] != '\0')
             {
                 for(int k = 0; k < cellSize + 2; k++)
                     cout << cellColumnChar;
@@ -210,7 +221,7 @@ void showBoard(char a[][MAX], int m, int n, int cellSize, char cellRowChar, char
 
 int main()
 {
-    char board[MAX][MAX];
+    char** board;
     int row = 6, column = 8;
     int cellSize = 5;
     char cellRowChar = '|';
@@ -235,6 +246,7 @@ int main()
         turn;
     }
 
+    deleteMemBoard(board, row, column);
     deleteBg(row, column, background);
 
     return 0;
