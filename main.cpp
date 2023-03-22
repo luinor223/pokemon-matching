@@ -2,50 +2,273 @@
 #include <conio.h>
 #include <ctime>
 #include <vector>
+#include <chrono>
+#include <thread>
+#include <queue>
+
 
 using namespace std;
 
 #define SIZE 12
 
-char deathIcon = 'X', aliveIcon = '~';
-char board[2][SIZE][SIZE];
-int state[SIZE][SIZE]; // 0 = dead, 1 = alive
+bool** occupied;
 bool isSelected[SIZE][SIZE];
+char** board;
+int row, col;
+bool canMatch = false;
 
-bool visited[SIZE][SIZE];
-
-int dx[] = {-1, 1, 0, 0},
+int dx[] = {-1, 1, 0, 0}, // UP DOWN LEFT RIGHT
     dy[] = {0, 0, -1, 1};
 
 struct Point{
     int x, y;
 };
 
-Point cur{1, 1};
-int cur_NumofSelectedPoint = 0, Max_NumofSelectedPoint = 3;
+Point cur{0, 0};
+int Max_NumofSelectedPoint = 2;
 vector <Point> selectedPoint;
-bool isInMap(int x, int y)
-{
-    return x > 0 && x < SIZE - 1 && y > 0 && y < SIZE - 1;
-}
-
-
-void DFS(Point curPoint, Point destination, int turnNum, int direction, vector <Point> result)
-{
-    visited[curPoint.x][curPoint.y] = true;
-    result.push_back({curPoint.x, curPoint.y});    
-  //  if (re)
-}
 
 void clear()
 {
 	system("cls");
 }
 
+bool isInMap(int x, int y)
+{
+    return x >= 0 && x < row  && y >= 0 && y < col;
+}
+
+void init_board()
+{
+    cout << "rows : ";
+    cin >> row;
+    cout << "col : ";
+    cin >> col;
+
+    board = new char*[row];
+    for (int i = 0; i < row; i++)
+        board[i] = new char[col];
+
+    occupied = new bool*[row+2];  // for left, right, top, bottom outline
+    for (int i = 0; i < row+2; i++)
+        occupied[i] = new bool[col+2];
+    
+    for (int i = 0; i < row+2; i++)  // set all value to false
+        for (int j = 0; j < col+2; j++)
+            occupied[i][j] = false;
+    
+}
+
+void make_board(){
+    srand(time(NULL));
+    char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
+    int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
+
+    vector<pair<int, int>> avail_pos;
+    for (int i = 0; i < row; i++) 
+        for (int j = 0; j < col; j++)
+        {
+            // if (i == 0 || i == row || j == 0 || j == col) // board's outline
+            //     board[i][j] = ' ';
+            // else
+            avail_pos.push_back(make_pair(i, j));
+        }
+    const int pairs = avail_pos.size() / 2;
+    for (int i = 0; i < pairs; i++) {
+        char c = alphabet[rand() % alphabet_size];
+
+        int pos1 = rand() % avail_pos.size();
+        int pos2 = rand() % avail_pos.size();
+        while (pos1 == pos2) { // if same position is selected
+            pos2 = rand() % avail_pos.size(); // select next position
+        }
+        
+        board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
+        occupied[avail_pos[pos1].first + 1][avail_pos[pos1].second + 1] = true; // offset 1 1
+
+        board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
+        occupied[avail_pos[pos2].first + 1][avail_pos[pos2].second + 1] = true; // offset 1 1
+
+        avail_pos.erase(avail_pos.begin() + max(pos1, pos2));
+
+        avail_pos.erase(avail_pos.begin() + min(pos1, pos2));
+    }
+}
+
+void DFS(Point curPoint, Point destination, int turnNum, vector <string> result, bool visited[][SIZE])
+{
+    clear();
+    if (turnNum > 2 || canMatch == true)
+        return;
+    visited[curPoint.x+1][curPoint.y+1] = true;
+    for (int i = 0; i < row+2; i++){
+        for (int j = 0; j < col+2; j++)
+            cout << visited[i][j];
+        cout << endl;
+    }   
+    cout << endl;
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    if (curPoint.x == destination.x && curPoint.y == destination.y)
+    {
+        canMatch = true;
+        for (int i = 0; i < result.size(); i++)
+            cout << result[i] << " ";
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+        return;
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        Point newPos;
+        newPos.x = curPoint.x + dx[i];
+        newPos.y = curPoint.y + dy[i];
+
+        if (isInMap(newPos.x+1, newPos.y+1) && visited[newPos.x+1][newPos.y+1] == false)
+        {
+            string direction;
+            switch (i){
+                case 0:
+                    direction = "UP";
+                    break;
+                case 1:
+                    direction = "DOWN";
+                    break;
+                case 2:
+                    direction = "LEFT";
+                    break;
+                case 3:
+                    direction = "RIGHT";
+                    break;
+            }
+            result.push_back(direction);
+            if (result.size() > 0 && direction != result[result.size()-1])
+            {   
+                cout << "newTurn" << endl;
+                turnNum++;
+            }
+            DFS(newPos, destination, turnNum, result, visited);
+            visited[curPoint.x+1][curPoint.y+1] = false;      
+            result.pop_back();   
+        }
+    }
+ 
+}
+
+vector<pair<int, int>> findPath(int _x, int _y, int x, int y)
+{
+	//INIT Graph
+	std::vector<std::vector<int>> e(row + 2, vector<int>(col+ 2, 0));
+	for (int i = 0; i < row; ++i)
+	{
+		for (int j = 0; j < col; ++j)
+		{
+			e[i + 1][j + 1] = board[i][j] != '~';
+		}
+	}
+	pair<int, int> s = { _x + 1, _y + 1 };
+	pair<int, int> t = { x + 1, y + 1 };
+
+	//BFS
+	const int dx[4] = { -1, 0, 1, 0 };
+	const int dy[4] = { 0, 1, 0, -1 };
+	queue<pair<int, int>> q;
+	vector<vector<pair<int, int>>> trace(e.size(), vector<pair<int, int>>(e[0].size(), make_pair(-1, -1)));
+	q.push(t);
+	trace[t.first][t.second] = std::make_pair(-2, -2);
+	e[s.first][s.second] = 0;
+	e[t.first][t.second] = 0;
+	while (!q.empty()) {
+		auto u = q.front();
+		q.pop();
+		if (u == s) break;
+		for (int i = 0; i < 4; ++i) {
+			int x = u.first + dx[i];
+			int y = u.second + dy[i];
+			while (x >= 0 && x < e.size() && y >= 0 && y < e[0].size() && e[x][y] == 0) {
+				if (trace[x][y].first == -1) {
+					trace[x][y] = u;
+					q.push({ x, y });
+				}
+				x += dx[i];
+				y += dy[i];
+			}
+		}
+	}
+
+	//trace back
+	vector<pair<int, int>> res;
+	if (trace[s.first][s.second].first != -1) {
+		while (s.first != -2) {
+			res.push_back({ s.first - 1, s.second - 1 });
+			s = trace[s.first][s.second];
+		}
+	}
+	return res;
+}
+
+void checkMatching()
+{
+    if (selectedPoint.size() < Max_NumofSelectedPoint) // not enough point
+        return;
+    
+    Point s = selectedPoint[0];
+    Point f = selectedPoint[1];
+
+    if (board[s.x][s.y] != board[f.x][f.y]) // different character
+    {   
+        isSelected[s.x][s.y] = false;
+        isSelected[f.x][f.y] = false;
+        selectedPoint.clear();
+        return;
+    }
+
+    bool visited[SIZE][SIZE];
+    // visited = new bool*[row+2];  // for left, right, top, bottom outline
+    // for (int i = 0; i < row+2; i++)
+    //     visited[i] = new bool[col+2];
+    
+    for (int i = 0; i < row+2; i++)
+        for (int j = 0; j < col+2; j++)
+            visited[i][j] = occupied[i][j];
+
+    visited[f.x+1][f.y+1] = false;
+
+    for (int i = 0; i < row+2; i++){
+        for (int j = 0; j < col+2; j++)
+            cout << visited[i][j];
+        cout << endl;
+    }
+
+    vector <pair<int, int>> res;
+    res = findPath(s.x, s.y, f.x, f.y);
+    for (int i = 0; i < res.size(); i++)
+        cout << res[i].first << " " << res[i].second << endl;
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    // vector <string> result;
+    // DFS(s, f, 0, result , visited);
+    // for (int i = 0; i < row+2; i++)
+    //     delete visited[i];
+    
+    // delete visited;
+    if (canMatch)
+    {
+        board[s.x][s.y] = '~';
+        board[f.x][f.y] = '~';
+        occupied[s.x+1][s.y+1] = false;
+        occupied[f.x+1][f.y+1] = false;
+        canMatch = false;
+    }
+    isSelected[s.x][s.y] = false;
+    isSelected[f.x][f.y] = false;
+
+    selectedPoint.clear();
+}
+
+
+
 void displayBoard()
 {
-    for (int i = 0; i < SIZE; i++){
-        for (int j = 0; j < SIZE; j++)
+    for (int i = 0; i < row; i++){
+        for (int j = 0; j < col; j++)
         {
             if (i == cur.x && j == cur.y && isSelected[i][j])
                 cout << "\033[37;42m"; // escape sequence
@@ -54,11 +277,19 @@ void displayBoard()
             else if (isSelected[i][j])
                 cout << "\033[1;32m"; // green text
 
-            cout << board[state[i][j]][i][j] << "\033[0m ";
+            cout << board[i][j] << "\033[0m ";
         }
         cout << endl;
     }
     cout << "Current Position : " << cur.x << " " << cur.y << endl;
+    cout << "current select point :" << endl;
+        for (int i = 0; i < selectedPoint.size(); i++)
+            cout << selectedPoint[i].x << " " << selectedPoint[i].y << endl;
+    for (int i = 0; i < row+2; i++){
+        for (int j = 0; j < col+2; j++)
+            cout << occupied[i][j];
+        cout << endl;
+    }
 }
 // rand() & vector.size()a
 void getInput() 
@@ -83,22 +314,23 @@ void getInput()
         break;
     case ' ':
         {
-            if (isSelected[cur.x][cur.y] == true) // if already selected
+            if (occupied[cur.x+1][cur.y+1] == true) // if the cur cell has block
             {
-                // Deselect point
-                isSelected[cur.x][cur.y] = false;
-                cur_NumofSelectedPoint--;
-                for (int i = 0; i < selectedPoint.size(); i++)
-                    if (selectedPoint[i].x == cur.x && selectedPoint[i].y == cur.y)
-                        selectedPoint.erase(selectedPoint.begin() + i);
-            }
-            else // if not, select that point
-            {
-                if (cur_NumofSelectedPoint < Max_NumofSelectedPoint) // check if number of selected point exceed the limit
+                if (isSelected[cur.x][cur.y] == true) // if already selected
                 {
-                    isSelected[cur.x][cur.y] = true;
-                    cur_NumofSelectedPoint++;
-                    selectedPoint.push_back({cur.x, cur.y});
+                    // Deselect point
+                    isSelected[cur.x][cur.y] = false;
+                    for (int i = 0; i < selectedPoint.size(); i++)
+                        if (selectedPoint[i].x == cur.x && selectedPoint[i].y == cur.y)
+                            selectedPoint.erase(selectedPoint.begin() + i);
+                }
+                else // if not, select that point
+                {
+                    if (selectedPoint.size() < Max_NumofSelectedPoint) // check if number of selected point exceed the limit
+                    {
+                        isSelected[cur.x][cur.y] = true;
+                        selectedPoint.push_back({cur.x, cur.y});
+                    }
                 }
             }
         }
@@ -108,34 +340,16 @@ void getInput()
 
 int main()
 {
-    cout << "This is some \033[7mhighlighted\033[0m text.\n";
-    // INIT MAP
-    for (int i = 0; i < SIZE; i++)
-        for (int j = 0; j < SIZE; j++)
-        {
-            board[0][i][j] = deathIcon;
-            board[1][i][j] = aliveIcon;
-        }
-    for (int i = 0; i < SIZE; i++)
-        for (int j = 0; j < SIZE; j++)
-            state[i][j] = 0;
-    for (int i = 1; i < SIZE-1; i++)
-        for (int j = 1; j < SIZE-1; j++)
-        {
-            state[i][j] = 1;
-            isSelected[i][j] = false;
-        }
-    ////////////////////////
+
+    init_board();
+    make_board();
+
     while (true)
     {
-            
+        checkMatching();
         displayBoard();
-        cout << "current selected Point Pos : ";
-        for (int i = 0; i < selectedPoint.size(); i++)
-            cout << selectedPoint[i].x << " " << selectedPoint[i].y << endl;
         getInput();
         
-        //changeState(x, y, 0);
         clear();
     }
     return 0;
