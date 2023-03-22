@@ -211,7 +211,7 @@ void checkMatching()
     Point f = selectedPoint[1];
 
     if (board[s.x][s.y] != board[f.x][f.y]) // different character
-    {   
+    {  
         isSelected[s.x][s.y] = false;
         isSelected[f.x][f.y] = false;
         selectedPoint.clear();
@@ -248,8 +248,8 @@ void checkMatching()
     // delete visited;
     if (res.size() <= 4 && res.size() >= 2)
     {
-        board[s.x][s.y] = '~';
-        board[f.x][f.y] = '~';
+        board[s.x][s.y] = '\0';
+        board[f.x][f.y] = '\0';
         occupied[s.x+1][s.y+1] = false;
         occupied[f.x+1][f.y+1] = false;
         //canMatch = false;
@@ -262,32 +262,32 @@ void checkMatching()
 
 
 
-void displayBoard()
-{
-    for (int i = 0; i < row; i++){
-        for (int j = 0; j < col; j++)
-        {
-            if (i == cur.x && j == cur.y && isSelected[i][j])
-                cout << "\033[37;42m"; // escape sequence
-            else if (i == cur.x && j == cur.y)
-                cout << "\033[7m"; // white background
-            else if (isSelected[i][j])
-                cout << "\033[1;32m"; // green text
+// void displayBoard()
+// {
+//     for (int i = 0; i < row; i++){
+//         for (int j = 0; j < col; j++)
+//         {
+//             if (i == cur.x && j == cur.y && isSelected[i][j])
+//                 cout << "\033[37;42m"; // escape sequence
+//             else if (i == cur.x && j == cur.y)
+//                 cout << "\033[7m"; // white background
+//             else if (isSelected[i][j])
+//                 cout << "\033[1;32m"; // green text
 
-            cout << board[i][j] << "\033[0m ";
-        }
-        cout << endl;
-    }
-    cout << "Current Position : " << cur.x << " " << cur.y << endl;
-    cout << "current select point :" << endl;
-        for (int i = 0; i < selectedPoint.size(); i++)
-            cout << selectedPoint[i].x << " " << selectedPoint[i].y << endl;
-    for (int i = 0; i < row+2; i++){
-        for (int j = 0; j < col+2; j++)
-            cout << occupied[i][j];
-        cout << endl;
-    }
-}
+//             cout << board[i][j] << "\033[0m ";
+//         }
+//         cout << endl;
+//     }
+//     cout << "Current Position : " << cur.x << " " << cur.y << endl;
+//     cout << "current select point :" << endl;
+//         for (int i = 0; i < selectedPoint.size(); i++)
+//             cout << selectedPoint[i].x << " " << selectedPoint[i].y << endl;
+//     for (int i = 0; i < row+2; i++){
+//         for (int j = 0; j < col+2; j++)
+//             cout << occupied[i][j];
+//         cout << endl;
+//     }
+// }
 // rand() & vector.size()a
 void getInput() 
 {
@@ -339,13 +339,18 @@ int main()
 {
     init_board();
     make_board();
+
     char** background;
     int bg_row = row, bg_column = col;
+    getFileContent(background, bg_row, bg_column, 5);
+
     while (true)
     {
         checkMatching();
-        displayBoard();
-        //showBoard(board, row, col, 5, '|', '-',  )
+        //displayBoard();
+        showBoard(board, row, col, 5, background, bg_row, bg_column);
+//GoTo(50, 10);
+        cout << cur.x << " " << cur.y << endl;
         getInput();
         
         clear();

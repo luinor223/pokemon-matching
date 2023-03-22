@@ -1,6 +1,6 @@
 #include "board.h"
 #include "background.cpp"
-#include "console.h"
+#include "console.cpp"
 
 void make_board(char** &board, int m, int n) {
     srand(time(NULL));
@@ -79,42 +79,42 @@ void showBoard(char** board, int row, int column, int cellSize, char** backgroun
         for (int j = 0; j < column; j++)
         {
             if(board[i][j] != '\0')
-                drawCell(board[i][j], offset_x + i*cellSize-1, offset_y + j*cellSize-1, cellSize);
+                drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize);
         }
     }
 }
 
-int main()
-{
-    char** board;
-    int row = 6, column = 8;
-    int cellSize = 5;
-    char cellRowChar = '|';
-    char cellColumnChar = '-';
-    make_board(board, row, column);
+// int main()
+// {
+//     // char** board;
+//     // int row = 6, column = 8;
+//     // int cellSize = 5;
+//     // char cellRowChar = '|';
+//     // char cellColumnChar = '-';
+//     // make_board(board, row, column);
 
-    char** background;
-    int bg_row = row, bg_column = column;
+//     // char** background;
+//     // int bg_row = row, bg_column = column;
     
-    getFileContent(background, bg_row, bg_column, cellSize);
+//     // getFileContent(background, bg_row, bg_column, cellSize);
 
-    int max_turns = 20;
-    int turn = 0;
-    system("cls");
-    while (turn < max_turns)
-    {
-        showBoard(board, row, column, cellSize, background, bg_row, bg_column);
+//     // int max_turns = 20;
+//     // int turn = 0;
+//     // system("cls");
+//     // while (turn < max_turns)
+//     // {
+//     //     showBoard(board, row, column, cellSize, background, bg_row, bg_column);
     
-        cout << "Nhap o muon xoa: ";
-        int x, y;
-        cin >> x >> y;
-        board[x][y] = '\0';
-        turn;
-    }
+//     //     cout << "Nhap o muon xoa: ";
+//     //     int x, y;
+//     //     cin >> x >> y;
+//     //     board[x][y] = '\0';
+//     //     turn;
+//     // }
 
-    deleteMemBoard(board, row, column);
-    deleteBg(row, column, background);
+//     // deleteMemBoard(board, row, column);
+//     // deleteBg(row, column, background);
 
-    return 0;
-}
+//     // return 0;
+// }
 
