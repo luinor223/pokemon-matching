@@ -1,7 +1,7 @@
 #include "board.h"
 #include "background.h"
 #include "console.h"
-// #include "main.h"
+#include "main.h"
 
 void make_board(char** &board, int m, int n) {
     srand(time(NULL));

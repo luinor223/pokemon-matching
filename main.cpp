@@ -1,33 +1,4 @@
-#include <iostream>
-#include <conio.h>
-#include <ctime>
-#include <vector>
-#include <chrono>
-#include <thread>
-#include <queue>
-
-#include "board.cpp"
-#include "console.cpp"
-#include "background.cpp"
-// #include "main.h"
-
-using namespace std;
-
-#define SIZE 12
-
-bool** occupied;
-char** board;
-bool isSelected[SIZE][SIZE];
-int row, col;
-bool canMatch = false;
-
-struct Point{
-    int x, y;
-};
-
-Point cur{0, 0};
-int Max_NumofSelectedPoint = 2;
-vector <Point> selectedPoint;
+#include "main.h"
 
 void clear()
 {
