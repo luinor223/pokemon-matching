@@ -1,73 +1,48 @@
 #include "main.h"
 
-void clear()
-{
-	system("cls");
-}
 
+// void make_board(){
+//     srand(time(NULL));
+//     char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
+//     int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
+
+//     vector<pair<int, int>> avail_pos;
+//     for (int i = 0; i < row; i++) 
+//         for (int j = 0; j < col; j++)
+//         {
+//             // if (i == 0 || i == row || j == 0 || j == col) // board's outline
+//             //     board[i][j] = ' ';
+//             // else
+//             avail_pos.push_back(make_pair(i, j));
+//         }
+//     const int pairs = avail_pos.size() / 2;
+//     for (int i = 0; i < pairs; i++) {
+//         char c = alphabet[rand() % alphabet_size];
+
+//         int pos1 = rand() % avail_pos.size();
+//         int pos2 = rand() % avail_pos.size();
+//         while (pos1 == pos2) { // if same position is selected
+//             pos2 = rand() % avail_pos.size(); // select next position
+//         }
+        
+//         board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
+//         occupied[avail_pos[pos1].first + 1][avail_pos[pos1].second + 1] = true; // offset 1 1
+
+//         board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
+//         occupied[avail_pos[pos2].first + 1][avail_pos[pos2].second + 1] = true; // offset 1 1
+
+//         avail_pos.erase(avail_pos.begin() + max(pos1, pos2));
+
+//         avail_pos.erase(avail_pos.begin() + min(pos1, pos2));
+//     }
+// }
 bool isInMap(int x, int y)
 {
     return x >= 0 && x < row  && y >= 0 && y < col;
 }
 
-void init_board()
-{
-    cout << "rows : ";
-    cin >> row;
-    cout << "col : ";
-    cin >> col;
 
-    board = new char*[row];
-    for (int i = 0; i < row; i++)
-        board[i] = new char[col];
-
-    occupied = new bool*[row+2];  // for left, right, top, bottom outline
-    for (int i = 0; i < row+2; i++)
-        occupied[i] = new bool[col+2];
-    
-    for (int i = 0; i < row+2; i++)  // set all value to false
-        for (int j = 0; j < col+2; j++)
-            occupied[i][j] = false;
-    
-}
-
-void make_board(){
-    srand(time(NULL));
-    char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
-    int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
-
-    vector<pair<int, int>> avail_pos;
-    for (int i = 0; i < row; i++) 
-        for (int j = 0; j < col; j++)
-        {
-            // if (i == 0 || i == row || j == 0 || j == col) // board's outline
-            //     board[i][j] = ' ';
-            // else
-            avail_pos.push_back(make_pair(i, j));
-        }
-    const int pairs = avail_pos.size() / 2;
-    for (int i = 0; i < pairs; i++) {
-        char c = alphabet[rand() % alphabet_size];
-
-        int pos1 = rand() % avail_pos.size();
-        int pos2 = rand() % avail_pos.size();
-        while (pos1 == pos2) { // if same position is selected
-            pos2 = rand() % avail_pos.size(); // select next position
-        }
-        
-        board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
-        occupied[avail_pos[pos1].first + 1][avail_pos[pos1].second + 1] = true; // offset 1 1
-
-        board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
-        occupied[avail_pos[pos2].first + 1][avail_pos[pos2].second + 1] = true; // offset 1 1
-
-        avail_pos.erase(avail_pos.begin() + max(pos1, pos2));
-
-        avail_pos.erase(avail_pos.begin() + min(pos1, pos2));
-    }
-}
-
-vector<pair<int, int>> findPath(int _x, int _y, int x, int y)
+vector<pair<int, int>> findPath(char** board, int _x, int _y, int x, int y)
 {
 	//INIT Graph
 	vector<vector<int>> e(row + 2, vector<int>(col+ 2, 0));
@@ -119,7 +94,7 @@ vector<pair<int, int>> findPath(int _x, int _y, int x, int y)
 	return res;
 }
 
-void checkMatching()
+void checkMatching(char** board)
 {
     if (selectedPoint.size() < Max_NumofSelectedPoint) // not enough point
         return;
@@ -135,25 +110,19 @@ void checkMatching()
         return;
     }
 
-    bool visited[SIZE][SIZE];
-    // visited = new bool*[row+2];  // for left, right, top, bottom outline
+    // bool visited[SIZE][SIZE];   
     // for (int i = 0; i < row+2; i++)
-    //     visited[i] = new bool[col+2];
-    
-    for (int i = 0; i < row+2; i++)
-        for (int j = 0; j < col+2; j++)
-            visited[i][j] = occupied[i][j];
+    //     for (int j = 0; j < col+2; j++)
+    //         visited[i][j] = occupied[i][j];
 
-    visited[f.x+1][f.y+1] = false;
-
-    for (int i = 0; i < row+2; i++){
-        for (int j = 0; j < col+2; j++)
-            cout << visited[i][j];
-        cout << endl;
-    }
+    // for (int i = 0; i < row+2; i++){
+    //     for (int j = 0; j < col+2; j++)
+    //         cout << visited[i][j];
+    //     cout << endl;
+    // }
 
     vector <pair<int, int>> res;
-    res = findPath(s.x, s.y, f.x, f.y);
+    res = findPath(board, s.x, s.y, f.x, f.y);
     for (int i = 0; i < res.size(); i++)
         cout << res[i].first << " " << res[i].second << endl;
     this_thread::sleep_for(chrono::seconds(3));
@@ -163,13 +132,12 @@ void checkMatching()
     //     delete visited[i];
     
     // delete visited;
-    if (res.size() <= 4 && res.size() >= 2)
+    if (res.size() <= 4 && res.size() >= 2) // valid
     {
         board[s.x][s.y] = '\0';
         board[f.x][f.y] = '\0';
         occupied[s.x+1][s.y+1] = false;
         occupied[f.x+1][f.y+1] = false;
-        //canMatch = false;
     }
     isSelected[s.x][s.y] = false;
     isSelected[f.x][f.y] = false;
@@ -225,8 +193,9 @@ void getInput()
 
 int main()
 {
-    init_board();
-    make_board();
+    char** board;
+    init_board(board);
+    make_board(board, row, col);
     SetWindowSize(400, 400);
     char** background;
     int bg_row = row, bg_column = col;
@@ -234,9 +203,9 @@ int main()
 
     while (true)
     {
-        checkMatching();
-        //displayBoard();
-        showBoard(board, row, col, 5, background, bg_row, bg_column, cur.x, cur.y);
+        checkMatching(board);
+
+        showBoard(board, row, col, 5, background, bg_row, bg_column);
         //GoTo(50, 10);
         cout << cur.x << " " << cur.y << endl;
         getInput();

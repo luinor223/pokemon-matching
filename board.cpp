@@ -1,7 +1,27 @@
 #include "board.h"
-#include "background.h"
-#include "console.h"
-#include "main.h"
+#include "background.cpp"
+#include "console.cpp"
+
+void init_board(char** &board)
+{
+    cout << "rows : ";
+    cin >> row;
+    cout << "col : ";
+    cin >> col;
+
+    board = new char*[row];
+    for (int i = 0; i < row; i++)
+        board[i] = new char[col];
+
+    occupied = new bool*[row+2];  // for left, right, top, bottom outline
+    for (int i = 0; i < row+2; i++)
+        occupied[i] = new bool[col+2];
+    
+    for (int i = 0; i < row+2; i++)  // set all value to false
+        for (int j = 0; j < col+2; j++)
+            occupied[i][j] = false;
+    
+}
 
 void make_board(char** &board, int m, int n) {
     srand(time(NULL));
@@ -49,7 +69,7 @@ void deleteMemBoard(char** &board, int m, int n)
     delete[] board;
 }
 
-void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellColumnChar, int backgroundColor, int textColor)
+void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellColumnChar, int backgourdColor, int textColor )
 {
     for (int i = 0; i < cellSize; i++)
     {
@@ -63,16 +83,12 @@ void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellCol
             else if (i == j && i == cellSize / 2)
                 cout << a;
             else
-            {
-                SetColor(backgroundColor, textColor);
                 cout << " ";
-                SetColor(0, 7);
-            }
         }
     }
 }
 
-void showBoard(char** board, int row, int column, int cellSize, char** background, int bg_row, int bg_column, int curX, int curY)
+void showBoard(char** board, int row, int column, int cellSize, char** background, int bg_row, int bg_column)
 {
     GoTo(0, 0);
     printBg(background, bg_row, bg_column);
@@ -84,14 +100,12 @@ void showBoard(char** board, int row, int column, int cellSize, char** backgroun
     for (int i = 0; i < row; i++)
     {
         for (int j = 0; j < column; j++)
-        {         
+        {
+            // if (cur.x == i && cur.y == j)
+            //     SetColor(7, 0);
             if(board[i][j] != '\0')
-            {
-                if (curX == i && curY == j)
-                    drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize, 179, 196, 7, 0);
-                else
-                    drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize, 179, 196, 0, 0);
-            }
+                drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize);
+            //SetColor(0, 0);
         }
     }
 }

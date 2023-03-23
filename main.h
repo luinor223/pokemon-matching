@@ -15,12 +15,9 @@
 using namespace std;
 
 
-
 bool** occupied;
-char** board;
 bool isSelected[SIZE][SIZE];
 int row, col;
-bool canMatch = false;
 
 struct Point{
     int x, y;

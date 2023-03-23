@@ -39,6 +39,11 @@ void SetColor(int backgound_color, int text_color)
 // 5 = Purple   13 = Light Purple  
 // 6 = Yellow     14 = Light Yellow
 // 7 = White     15 = Bright White
+void clear()
+{
+	system("cls");
+}
+
 
 
 
