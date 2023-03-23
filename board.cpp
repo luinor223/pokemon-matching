@@ -1,3 +1,5 @@
+
+#include "main.h"
 #include "board.h"
 #include "background.cpp"
 #include "console.cpp"

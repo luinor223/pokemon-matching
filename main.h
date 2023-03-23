@@ -6,17 +6,13 @@
 #include <thread>
 #include <queue>
 
-#include "board.cpp"
-#include "console.cpp"
-#include "background.cpp"
-
-#define SIZE 12
+#define MAX 12
 
 using namespace std;
 
 
 bool** occupied;
-bool isSelected[SIZE][SIZE];
+bool isSelected[MAX][MAX];
 int row, col;
 
 struct Point{

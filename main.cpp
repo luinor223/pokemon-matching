@@ -1,4 +1,5 @@
-#include "main.h"
+//#include "main.h"
+#include "header.h"
 
 
 // void make_board(){
