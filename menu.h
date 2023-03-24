@@ -1,5 +1,9 @@
+#pragma once
 #include <iostream>
-#include <windows.h>
-#include <conio.h>
+#include <fcntl.h>
+#include <io.h>
+#include "console.cpp"
+#include "string"
+#include "main.h"
 
 using namespace std;
