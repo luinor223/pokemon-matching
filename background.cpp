@@ -2,7 +2,7 @@
 
 void getFileContent(char **&background, int &m, int &n, int cellSize)
 {
-    ifstream File("art.txt");
+    ifstream File("background.txt");
     string result = "";
 
     

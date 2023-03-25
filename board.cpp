@@ -29,10 +29,7 @@ void make_board(char** &board, int m, int n) {
         board[i] = new char[n]; 
         for (int j = 0; j < n; j++)
         {
-            if (i==0 || j == 0 || i == m - 1 || j == n - 1)
-                board[i][j] = '\0';
-            else
-                avail_pos.push_back(make_pair(i, j));
+            avail_pos.push_back(make_pair(i, j));
         } 
     }  
 
@@ -63,27 +60,69 @@ void deleteMemBoard(char** &board, int m, int n)
     delete[] board;
 }
 
-void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellColumnChar, int backgourdColor, int outlineColor )
+// void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellColumnChar, int backgourdColor, int outlineColor )
+// {
+//     for (int i = 0; i < cellSize; i++)
+//     {
+//         GoTo(x+i, y);
+//         for (int j = 0; j < cellSize; j++)
+//         {
+//             if (i == 0 || i == cellSize-1)
+//                 cout << cellColumnChar;
+//             else if (j == 0 || j == cellSize-1) 
+//                 cout << cellRowChar;
+//             else if (i == j && i == cellSize / 2)
+//                 cout << a;
+//             else
+//             {
+//                 SetColor(backgourdColor, 7);
+//                 cout << " ";
+//                 SetColor(0, 7);
+//             }
+//         }
+//     }
+// }
+
+void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, int bg_color, int text_color)
 {
-    for (int i = 0; i < cellSize; i++)
+    // Create a separate wcout stream object
+    //std::wostream& wcout = std::wcout;
+
+    // Set the output mode to Unicode for the wcout object
+    _setmode(_fileno(stdout), _O_U16TEXT);
+
+    for (int i = 0; i < cellSizeRow; i++)
     {
         GoTo(x+i, y);
-        for (int j = 0; j < cellSize; j++)
+        for (int j = 0; j < cellSizeColumn; j++)
         {
-            if (i == 0 || i == cellSize-1)
-                cout << cellColumnChar;
-            else if (j == 0 || j == cellSize-1) 
-                cout << cellRowChar;
-            else if (i == j && i == cellSize / 2)
-                cout << a;
+            if (i == 0 && j == 0) 
+                wcout << L"\u250C";
+            else if (i == 0 && j == cellSizeColumn - 1)
+                wcout << L"\u2510";
+            else if (i == cellSizeRow - 1 && j == 0)
+                wcout << L"\u2514";
+            else if (i == cellSizeRow - 1 && j == cellSizeColumn - 1)
+                wcout << L"\u2518";
+            else if (i == 0 || i == cellSizeRow-1)
+                wcout << L"\u2500";
+            else if (j == 0 || j == cellSizeColumn-1) 
+                wcout << L"\u2502";
             else
             {
-                SetColor(backgourdColor, 7);
-                cout << " ";
+                SetColor(bg_color, text_color);
+                wcout << " ";
                 SetColor(0, 7);
             }
         }
     }
+    // Set the output mode back to ASCII for stdout
+    _setmode(_fileno(stdout), _O_TEXT);
+
+    GoTo(x + cellSizeRow / 2 , y + (cellSizeColumn - text.length()) / 2);
+    SetColor(bg_color, text_color);
+    cout << text;
+    SetColor(0, 7);
 }
 
 void showBoard(char** board, int row, int column, int cellSize, char** background, int bg_row, int bg_column)
@@ -101,8 +140,13 @@ void showBoard(char** board, int row, int column, int cellSize, char** backgroun
         {
             // if (cur.x == i && cur.y == j)
             //     SetColor(7, 0);
-            if(board[i][j] != '\0')
-                drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize);
+            string s;
+            s = board[i][j];
+            if(board[i][j] != '\0'){
+                drawCell(s, offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize, cellSize);
+                if(i== cur.x && j == cur.y)
+                    drawCell(s, offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize, cellSize, white, black);
+            }
             //SetColor(0, 0);
         }
     }

@@ -51,7 +51,7 @@ vector<pair<int, int>> findPath(char** board, int _x, int _y, int x, int y)
 	{
 		for (int j = 0; j < col; ++j)
 		{
-			e[i + 1][j + 1] = board[i][j] != '~';
+			e[i + 1][j + 1] = board[i][j] != '\0';
 		}
 	}
 	pair<int, int> s = { _x + 1, _y + 1 };
@@ -137,8 +137,6 @@ void checkMatching(char** board)
     {
         board[s.x][s.y] = '\0';
         board[f.x][f.y] = '\0';
-        occupied[s.x+1][s.y+1] = false;
-        occupied[f.x+1][f.y+1] = false;
     }
     isSelected[s.x][s.y] = false;
     isSelected[f.x][f.y] = false;
@@ -146,29 +144,35 @@ void checkMatching(char** board)
     selectedPoint.clear();
 }
 
-void getInput() 
+void getInput(char** board) 
 {
     char c = getch(); // get direct input
+    string content;
     switch (c){ 
     case 's':
-        if (isInMap(cur.x + 1, cur.y))
+        if (isInMap(cur.x + 1, cur.y) && board[cur.x + 1][cur.y] != '\0')
+        {
             cur.x++;
+            //content = board[cur.x][cur.y];
+            //drawCell(content,  );
+        }
+
         break;
     case 'd':
-        if (isInMap(cur.x, cur.y + 1))
+        if (isInMap(cur.x, cur.y + 1) && board[cur.x+1][cur.y + 1] != '\0')
             cur.y++;
         break;
     case 'a':
-        if (isInMap(cur.x, cur.y - 1))    
+        if (isInMap(cur.x, cur.y - 1) && board[cur.x][cur.y - 1] != '\0')    
             cur.y--;
         break;
     case 'w':
-        if (isInMap(cur.x - 1, cur.y))
+        if (isInMap(cur.x - 1, cur.y) && board[cur.x - 1][cur.y] != '\0')
             cur.x--;
         break;
     case ' ':
         {
-            if (occupied[cur.x+1][cur.y+1] == true) // if the cur cell has block
+            if (board[cur.x][cur.y] != '\0') // if the cur cell has block
             {
                 if (isSelected[cur.x][cur.y] == true) // if already selected
                 {
@@ -210,7 +214,7 @@ int main()
         showBoard(board, row, col, 5, background, bg_row, bg_column);
         //GoTo(50, 10);
         cout << cur.x << " " << cur.y << endl;
-        getInput();
+        getInput(board);
         
         clear();
     }
