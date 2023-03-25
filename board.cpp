@@ -3,6 +3,7 @@
 #include "background.cpp"
 #include "console.cpp"
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 void init_board(char** &board)
 {
@@ -17,6 +18,8 @@ void init_board(char** &board)
 
   
 }
+=======
+>>>>>>> parent of fda5299 (visual effect)
 =======
 >>>>>>> parent of fda5299 (visual effect)
 
@@ -67,7 +70,11 @@ void deleteMemBoard(char** &board, int m, int n)
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellColumnChar, int backgourdColor, int outlineColor )
+=======
+void drawCell(char a, int x, int y, int cellSize, char cellRowChar = '|', char cellColumnChar = '-')
+>>>>>>> parent of fda5299 (visual effect)
 =======
 void drawCell(char a, int x, int y, int cellSize, char cellRowChar = '|', char cellColumnChar = '-')
 >>>>>>> parent of fda5299 (visual effect)
@@ -85,8 +92,11 @@ void drawCell(char a, int x, int y, int cellSize, char cellRowChar = '|', char c
                 cout << a;
             else
 <<<<<<< HEAD
+<<<<<<< HEAD
             {
                 SetColor(backgourdColor, 7);
+=======
+>>>>>>> parent of fda5299 (visual effect)
 =======
 >>>>>>> parent of fda5299 (visual effect)
                 cout << " ";
@@ -106,11 +116,16 @@ void showBoard(char** board, int row, int column, int cellSize, char** backgroun
         for (int j = 0; j < column; j++)
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
             // if (cur.x == i && cur.y == j)
             //     SetColor(7, 0);
             if(board[i][j] != '\0')
                 drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize);
             //SetColor(0, 0);
+=======
+            if(board[i][j] != '\0')
+                drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize);
+>>>>>>> parent of fda5299 (visual effect)
 =======
             if(board[i][j] != '\0')
                 drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize);

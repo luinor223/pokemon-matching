@@ -357,6 +357,9 @@ int main()
     init_board();
     make_board();
 
+<<<<<<< HEAD
+>>>>>>> parent of fda5299 (visual effect)
+=======
 >>>>>>> parent of fda5299 (visual effect)
     char** background;
     int bg_row = row, bg_column = col;
@@ -375,6 +378,9 @@ int main()
         //displayBoard();
         showBoard(board, row, col, 5, background, bg_row, bg_column);
 //GoTo(50, 10);
+<<<<<<< HEAD
+>>>>>>> parent of fda5299 (visual effect)
+=======
 >>>>>>> parent of fda5299 (visual effect)
         cout << cur.x << " " << cur.y << endl;
         getInput();

@@ -22,6 +22,7 @@ void SetWindowSize(SHORT width, SHORT height)
  
     SetConsoleWindowInfo(hStdout, 1, &WindowSize);
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 
 void SetColor(int backgound_color, int text_color)
@@ -49,6 +50,9 @@ void clear()
 
 
 
+=======
+}
+>>>>>>> parent of fda5299 (visual effect)
 =======
 }
 >>>>>>> parent of fda5299 (visual effect)
