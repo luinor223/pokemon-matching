@@ -1,4 +1,3 @@
-
 #include "main.h"
 #include "board.h"
 #include "background.cpp"
@@ -15,14 +14,7 @@ void init_board(char** &board)
     for (int i = 0; i < row; i++)
         board[i] = new char[col];
 
-    occupied = new bool*[row+2];  // for left, right, top, bottom outline
-    for (int i = 0; i < row+2; i++)
-        occupied[i] = new bool[col+2];
-    
-    for (int i = 0; i < row+2; i++)  // set all value to false
-        for (int j = 0; j < col+2; j++)
-            occupied[i][j] = false;
-    
+  
 }
 
 void make_board(char** &board, int m, int n) {
@@ -71,7 +63,7 @@ void deleteMemBoard(char** &board, int m, int n)
     delete[] board;
 }
 
-void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellColumnChar, int backgourdColor, int textColor )
+void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellColumnChar, int backgourdColor, int outlineColor )
 {
     for (int i = 0; i < cellSize; i++)
     {
@@ -85,7 +77,11 @@ void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellCol
             else if (i == j && i == cellSize / 2)
                 cout << a;
             else
+            {
+                SetColor(backgourdColor, 7);
                 cout << " ";
+                SetColor(0, 7);
+            }
         }
     }
 }

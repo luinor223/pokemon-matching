@@ -11,16 +11,14 @@
 
 using namespace std;
 
-
-bool** occupied;
 bool isSelected[MAX][MAX];
 int row, col;
 int WinColumn = 120;
 int WinRow = 60;
 
-int white = 7;
-int black = 0;
-int yellow = 6;
+const int white = 7;
+const int black = 0;
+const int yellow = 6;
 
 struct Point{
     int x, y;

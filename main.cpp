@@ -200,6 +200,7 @@ int main()
     SetWindowSize(400, 400);
     char** background;
     int bg_row = row, bg_column = col;
+    
     getFileContent(background, bg_row, bg_column, 5);
 
     while (true)
