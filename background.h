@@ -7,6 +7,5 @@
 
 using namespace std;
 
-void getFileContent(char **&background, int &m, int &n, int cellSize);
+void getFileContent(char **&background, int &m, int &n);
 void deleteBg(int m, int n, char **&background);
-void printBg(char** background, int bg_row, int bg_column);

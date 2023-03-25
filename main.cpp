@@ -1,11 +1,16 @@
 //#include "main.h"
 #include "header.h"
 
+<<<<<<< HEAD
 
 // void make_board(){
 //     srand(time(NULL));
 //     char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
 //     int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
+=======
+#include "board.cpp"
+using namespace std;
+>>>>>>> parent of fda5299 (visual effect)
 
 //     vector<pair<int, int>> avail_pos;
 //     for (int i = 0; i < row; i++) 
@@ -20,6 +25,7 @@
 //     for (int i = 0; i < pairs; i++) {
 //         char c = alphabet[rand() % alphabet_size];
 
+<<<<<<< HEAD
 //         int pos1 = rand() % avail_pos.size();
 //         int pos2 = rand() % avail_pos.size();
 //         while (pos1 == pos2) { // if same position is selected
@@ -28,6 +34,13 @@
         
 //         board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
 //         occupied[avail_pos[pos1].first + 1][avail_pos[pos1].second + 1] = true; // offset 1 1
+=======
+bool** occupied;
+bool isSelected[SIZE][SIZE];
+char** board;
+int row, col;
+bool canMatch = false;
+>>>>>>> parent of fda5299 (visual effect)
 
 //         board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
 //         occupied[avail_pos[pos2].first + 1][avail_pos[pos2].second + 1] = true; // offset 1 1
@@ -43,7 +56,119 @@ bool isInMap(int x, int y)
 }
 
 
+<<<<<<< HEAD
 vector<pair<int, int>> findPath(char** board, int _x, int _y, int x, int y)
+=======
+    board = new char*[row];
+    for (int i = 0; i < row; i++)
+        board[i] = new char[col];
+
+    occupied = new bool*[row+2];  // for left, right, top, bottom outline
+    for (int i = 0; i < row+2; i++)
+        occupied[i] = new bool[col+2];
+    
+    for (int i = 0; i < row+2; i++)  // set all value to false
+        for (int j = 0; j < col+2; j++)
+            occupied[i][j] = false;
+    
+}
+
+void make_board(){
+    srand(time(NULL));
+    char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L'};
+    int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
+
+    vector<pair<int, int>> avail_pos;
+    for (int i = 0; i < row; i++) 
+        for (int j = 0; j < col; j++)
+        {
+            // if (i == 0 || i == row || j == 0 || j == col) // board's outline
+            //     board[i][j] = ' ';
+            // else
+            avail_pos.push_back(make_pair(i, j));
+        }
+    const int pairs = avail_pos.size() / 2;
+    for (int i = 0; i < pairs; i++) {
+        char c = alphabet[rand() % alphabet_size];
+
+        int pos1 = rand() % avail_pos.size();
+        int pos2 = rand() % avail_pos.size();
+        while (pos1 == pos2) { // if same position is selected
+            pos2 = rand() % avail_pos.size(); // select next position
+        }
+        
+        board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
+        occupied[avail_pos[pos1].first + 1][avail_pos[pos1].second + 1] = true; // offset 1 1
+
+        board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
+        occupied[avail_pos[pos2].first + 1][avail_pos[pos2].second + 1] = true; // offset 1 1
+
+        avail_pos.erase(avail_pos.begin() + max(pos1, pos2));
+
+        avail_pos.erase(avail_pos.begin() + min(pos1, pos2));
+    }
+}
+
+// void DFS(Point curPoint, Point destination, int turnNum, vector <string> result, bool visited[][SIZE])
+// {
+//     clear();
+//     if (turnNum > 2 || canMatch == true)
+//         return;
+//     visited[curPoint.x+1][curPoint.y+1] = true;
+//     for (int i = 0; i < row+2; i++){
+//         for (int j = 0; j < col+2; j++)
+//             cout << visited[i][j];
+//         cout << endl;
+//     }   
+//     cout << endl;
+//     this_thread::sleep_for(chrono::seconds(1));
+//     if (curPoint.x == destination.x && curPoint.y == destination.y)
+//     {
+//         canMatch = true;
+//         for (int i = 0; i < result.size(); i++)
+//             cout << result[i] << " ";
+//         this_thread::sleep_for(chrono::seconds(3));
+//         return;
+//     }
+//     for (int i = 0; i < 4; i++)
+//     {
+//         Point newPos;
+//         newPos.x = curPoint.x + dx[i];
+//         newPos.y = curPoint.y + dy[i];
+
+//         if (isInMap(newPos.x+1, newPos.y+1) && visited[newPos.x+1][newPos.y+1] == false)
+//         {
+//             string direction;
+//             switch (i){
+//                 case 0:
+//                     direction = "UP";
+//                     break;
+//                 case 1:
+//                     direction = "DOWN";
+//                     break;
+//                 case 2:
+//                     direction = "LEFT";
+//                     break;
+//                 case 3:
+//                     direction = "RIGHT";
+//                     break;
+//             }
+//             result.push_back(direction);
+//             if (result.size() > 0 && direction != result[result.size()-1])
+//             {   
+//                 cout << "newTurn" << endl;
+//                 turnNum++;
+//             }
+//             DFS(newPos, destination, turnNum, result, visited);
+//             visited[curPoint.x+1][curPoint.y+1] = false;      
+//             result.pop_back();   
+//         }
+//     }
+
+// }
+
+vector<pair<int, int>> findPath(int _x, int _y, int x, int y)
+>>>>>>> parent of fda5299 (visual effect)
 {
 	//INIT Graph
 	vector<vector<int>> e(row + 2, vector<int>(col+ 2, 0));
@@ -146,6 +271,35 @@ void checkMatching(char** board)
     selectedPoint.clear();
 }
 
+
+
+// void displayBoard()
+// {
+//     for (int i = 0; i < row; i++){
+//         for (int j = 0; j < col; j++)
+//         {
+//             if (i == cur.x && j == cur.y && isSelected[i][j])
+//                 cout << "\033[37;42m"; // escape sequence
+//             else if (i == cur.x && j == cur.y)
+//                 cout << "\033[7m"; // white background
+//             else if (isSelected[i][j])
+//                 cout << "\033[1;32m"; // green text
+
+//             cout << board[i][j] << "\033[0m ";
+//         }
+//         cout << endl;
+//     }
+//     cout << "Current Position : " << cur.x << " " << cur.y << endl;
+//     cout << "current select point :" << endl;
+//         for (int i = 0; i < selectedPoint.size(); i++)
+//             cout << selectedPoint[i].x << " " << selectedPoint[i].y << endl;
+//     for (int i = 0; i < row+2; i++){
+//         for (int j = 0; j < col+2; j++)
+//             cout << occupied[i][j];
+//         cout << endl;
+//     }
+// }
+// rand() & vector.size()a
 void getInput() 
 {
     char c = getch(); // get direct input
@@ -194,10 +348,16 @@ void getInput()
 
 int main()
 {
+<<<<<<< HEAD
     char** board;
     init_board(board);
     make_board(board, row, col);
     SetWindowSize(400, 400);
+=======
+    init_board();
+    make_board();
+
+>>>>>>> parent of fda5299 (visual effect)
     char** background;
     int bg_row = row, bg_column = col;
     
@@ -205,10 +365,17 @@ int main()
 
     while (true)
     {
+<<<<<<< HEAD
         checkMatching(board);
 
         showBoard(board, row, col, 5, background, bg_row, bg_column);
         //GoTo(50, 10);
+=======
+        checkMatching();
+        //displayBoard();
+        showBoard(board, row, col, 5, background, bg_row, bg_column);
+//GoTo(50, 10);
+>>>>>>> parent of fda5299 (visual effect)
         cout << cur.x << " " << cur.y << endl;
         getInput();
         

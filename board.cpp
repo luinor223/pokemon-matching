@@ -2,6 +2,7 @@
 #include "board.h"
 #include "background.cpp"
 #include "console.cpp"
+<<<<<<< HEAD
 
 void init_board(char** &board)
 {
@@ -16,6 +17,8 @@ void init_board(char** &board)
 
   
 }
+=======
+>>>>>>> parent of fda5299 (visual effect)
 
 void make_board(char** &board, int m, int n) {
     srand(time(NULL));
@@ -32,7 +35,7 @@ void make_board(char** &board, int m, int n) {
             if (i==0 || j == 0 || i == m - 1 || j == n - 1)
                 board[i][j] = '\0';
             else
-                avail_pos.push_back(make_pair(i, j));
+                avail_pos.push_back(std::make_pair(i, j));
         } 
     }  
 
@@ -63,7 +66,11 @@ void deleteMemBoard(char** &board, int m, int n)
     delete[] board;
 }
 
+<<<<<<< HEAD
 void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellColumnChar, int backgourdColor, int outlineColor )
+=======
+void drawCell(char a, int x, int y, int cellSize, char cellRowChar = '|', char cellColumnChar = '-')
+>>>>>>> parent of fda5299 (visual effect)
 {
     for (int i = 0; i < cellSize; i++)
     {
@@ -77,11 +84,12 @@ void drawCell(char a, int x, int y, int cellSize, char cellRowChar, char cellCol
             else if (i == j && i == cellSize / 2)
                 cout << a;
             else
+<<<<<<< HEAD
             {
                 SetColor(backgourdColor, 7);
+=======
+>>>>>>> parent of fda5299 (visual effect)
                 cout << " ";
-                SetColor(0, 7);
-            }
         }
     }
 }
@@ -92,18 +100,21 @@ void showBoard(char** board, int row, int column, int cellSize, char** backgroun
     printBg(background, bg_row, bg_column);
     int offset_x = (bg_row - row * cellSize) / 2;
     int offset_y = (bg_column - column*cellSize) / 2;
-    offset_x = (offset_x < 0) ? 0 : offset_x;
-    offset_y = (offset_y < 0) ? 0 : offset_y;
     GoTo(offset_x, offset_y);
     for (int i = 0; i < row; i++)
     {
         for (int j = 0; j < column; j++)
         {
+<<<<<<< HEAD
             // if (cur.x == i && cur.y == j)
             //     SetColor(7, 0);
             if(board[i][j] != '\0')
                 drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize);
             //SetColor(0, 0);
+=======
+            if(board[i][j] != '\0')
+                drawCell(board[i][j], offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize);
+>>>>>>> parent of fda5299 (visual effect)
         }
     }
 }
