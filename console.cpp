@@ -23,7 +23,7 @@ void SetWindowSize(SHORT width, SHORT height)
     SetConsoleWindowInfo(hStdout, 1, &WindowSize);
 }
 
-void SetColor(int backgound_color, int text_color)
+void SetColor(int backgound_color = 0, int text_color = 7)
 {
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 

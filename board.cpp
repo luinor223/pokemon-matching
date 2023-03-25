@@ -129,25 +129,22 @@ void showBoard(char** board, int row, int column, int cellSize, char** backgroun
 {
     GoTo(0, 0);
     printBg(background, bg_row, bg_column);
+
     int offset_x = (bg_row - row * cellSize) / 2;
     int offset_y = (bg_column - column*cellSize) / 2;
     offset_x = (offset_x < 0) ? 0 : offset_x;
     offset_y = (offset_y < 0) ? 0 : offset_y;
     GoTo(offset_x, offset_y);
+    
     for (int i = 0; i < row; i++)
     {
         for (int j = 0; j < column; j++)
         {
-            // if (cur.x == i && cur.y == j)
-            //     SetColor(7, 0);
             string s;
             s = board[i][j];
             if(board[i][j] != '\0'){
                 drawCell(s, offset_x + i*cellSize-i, offset_y + j*(cellSize+2)-j, cellSize, cellSize + 2);
-                if(i== cur.x && j == cur.y)
-                    drawCell(s, offset_x + i*cellSize-i, offset_y + j*(cellSize+2)-j, cellSize, cellSize + 2, white, black);
             }
-            //SetColor(0, 0);
         }
     }
 }
