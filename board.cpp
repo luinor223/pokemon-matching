@@ -22,11 +22,11 @@ void make_board(char** &board, int m, int n) {
     char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L', 'K' , 'I'};
     int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
 
-    board = new char *[m];
+    //board = new char *[m];
     vector<pair<int, int>> avail_pos;
     for (int i = 0; i < m; i++)
     {
-        board[i] = new char[n]; 
+        //board[i] = new char[n]; 
         for (int j = 0; j < n; j++)
         {
             avail_pos.push_back(make_pair(i, j));
@@ -143,9 +143,9 @@ void showBoard(char** board, int row, int column, int cellSize, char** backgroun
             string s;
             s = board[i][j];
             if(board[i][j] != '\0'){
-                drawCell(s, offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize, cellSize);
+                drawCell(s, offset_x + i*cellSize-i, offset_y + j*(cellSize+2)-j, cellSize, cellSize + 2);
                 if(i== cur.x && j == cur.y)
-                    drawCell(s, offset_x + i*cellSize-i, offset_y + j*cellSize-j, cellSize, cellSize, white, black);
+                    drawCell(s, offset_x + i*cellSize-i, offset_y + j*(cellSize+2)-j, cellSize, cellSize + 2, white, black);
             }
             //SetColor(0, 0);
         }

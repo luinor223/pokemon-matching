@@ -218,5 +218,8 @@ int main()
         
         clear();
     }
+
+    deleteBg(bg_row, bg_column, background);
+    deleteMemBoard(board, row, col);
     return 0;
 }
