@@ -69,9 +69,10 @@ void drawMatchingLine(vector <pair <int, int> > res, int offset_x, int offset_y,
         if (diff_x != 0) // vertical change
             s = "|";
         else // horizontal change
-            s = '-'; 
-
-        drawCell(s, offset_x + res[i].first*cellSize - res[i].first, offset_y + res[i].second*(cellSize+2) - res[i].second, diff_y, diff_x);
+            s = '_'; 
+    cout << "AAAAAAAA";
+        drawLine(res[i-1].first + offset_x + res[i-1].first*cellSize, res[i-1].second + offset_y + res[i-1].second*(cellSize+3), 
+                res[i].first + offset_x + res[i].first*cellSize, res[i].second + offset_y + res[i].second*(cellSize+3), s);
     }
 }
 
@@ -94,23 +95,16 @@ void checkMatching(char** board, char** background, int bg_row, int bg_column, i
 
     vector <pair<int, int>> res;
     res = findPath(board, s.x, s.y, f.x, f.y);
-    // for (int i = 0; i < res.size(); i++)
-    //     cout << res[i].first << " " << res[i].second << endl;
-    
 
     if (res.size() <= 4 && res.size() >= 2) // valid
     {
         //drawMatchingLine(res, offset_x, offset_y, cellSize);
-        this_thread::sleep_for(chrono::seconds(0));
+        //this_thread::sleep_for(chrono::seconds(2));
+
         board[s.x][s.y] = '\0';
         board[f.x][f.y] = '\0';
         clear();
         showBoard(board, row, col, 5, background, bg_row, bg_column);
-        while (board[cur.x][cur.y] == '\0') // random until the cur pos is not empty cell
-        {
-            cur.x = rand() % row;
-            cur.y = rand() % col;
-        }
     }
     selectedPoint.clear();
 }
@@ -133,32 +127,33 @@ void drawSelectedPoint(char** board, vector <Point> selectedPoint, int offset_x,
         int x = selectedPoint[i].x;
         int y = selectedPoint[i].y;
         temp = board[x][y];
-        drawCell(temp, offset_x + x*cellSize-x, offset_y + y*(cellSize+2)-y, cellSize, cellSize + 3, 11, 7);
+        drawCell(temp, offset_x + x*cellSize-x, offset_y + y*(cellSize+3)-y, cellSize, cellSize + 3, 11, 7);
     }
 }
 
-void drawNewCurrentSelectedPoint(char** board, int x, int y, int offset_x, int offset_y, int cellSize)
+void drawSelectingPoint(char** board, int x, int y, int offset_x, int offset_y, int cellSize)
 { 
-    Point original = cur;
-    do 
+    string temp;
+    int mode;
+    temp = board[cur.x][cur.y];
+    if ( board[cur.x][cur.y] == '\0')
+        mode = 1;
+    else
+        mode = 0;
+    drawCell(temp, offset_x + cur.x*cellSize - cur.x, offset_y + cur.y*(cellSize + 3) - cur.y, cellSize, cellSize + 3, 0, 7, mode); // deselect the old cell
+
+    if (isInMap(cur.x + x, cur.y + y)) 
     {
         cur.x += x;
         cur.y += y;
-    } while (isInMap(cur.x, cur.y) && board[cur.x][cur.y] == '\0');
+    } 
 
-    if (isInMap(cur.x, cur.y) == true) 
-    {
-        string temp;
-        temp = board[original.x][original.y];
-        drawCell(temp, offset_x + original.x*cellSize - original.x, offset_y + original.y*(cellSize + 3) - original.y, cellSize, cellSize + 3); // deselect the old cell
-
-        temp = board[cur.x][cur.y];
-        drawCell(temp, offset_x + cur.x*cellSize - cur.x, offset_y + cur.y*(cellSize + 3) - cur.y, cellSize, cellSize + 3, 7, 0); // select the new one
-    }
-    else // no more cell avaliable, return to the orginal position
-        cur = original;
-    
-
+    temp = board[cur.x][cur.y];
+    if ( board[cur.x][cur.y] == '\0')
+        mode = 1;
+    else
+        mode = 0;
+    drawCell(temp, offset_x + cur.x*cellSize - cur.x, offset_y + cur.y*(cellSize + 3) - cur.y, cellSize, cellSize + 3, 7, 0, mode); // select the new one
 }
 
 void playerAction(char** board, int  offset_x, int offset_y, int cellSize) 
@@ -201,7 +196,7 @@ void playerAction(char** board, int  offset_x, int offset_y, int cellSize)
         break;
     }
     if (x != 0 || y != 0) // there is a movement input
-        drawNewCurrentSelectedPoint(board, x, y, offset_x, offset_y, cellSize);
+        drawSelectingPoint(board, x, y, offset_x, offset_y, cellSize);
 }
 
 int main()
@@ -223,7 +218,7 @@ int main()
     {
         checkMatching(board, background, bg_row, bg_column, board_offset_x, board_offset_y, cellSize);
         drawSelectedPoint(board, selectedPoint, board_offset_x, board_offset_y, cellSize);
-        drawNewCurrentSelectedPoint(board, 0, 0, board_offset_x, board_offset_y, cellSize);
+        drawSelectingPoint(board, 0, 0, board_offset_x, board_offset_y, cellSize);
         //showBoard(board, row, col, 5, background, bg_row, bg_column);
         playerAction(board, board_offset_x, board_offset_y, cellSize);
     }
