@@ -1,16 +1,4 @@
-#include "menu.h"
-#include "draw.cpp"
-/*
-Page 1 = Log in / Register / Quit
-Page 2 = Log in page
-Page 3 = Register page
-Page 4 = Start / Leaderboard / Credit / Quit
-Page 5 = Difficulty choice
-Page 6 = Custom board page
-Page 7 = Show leaderboard
-Page 8 = Show game credit
-Page 9 = Gameplay
-*/
+#include "account.h"
 
 void processReg(savefile &player, bool &isLogged)
 {
@@ -179,7 +167,7 @@ void displayLoginRegisterMenu(savefile &player)
                     }
                     else
                     {
-                        //QUIT?
+                        //HOW QUIT CONSOLE?
                     }
                     break;
             }
@@ -187,119 +175,6 @@ void displayLoginRegisterMenu(savefile &player)
     }
 }
 
-void displayMenu(int page, int choice)
-{
-    clear();
-    string gname = "POKEMON PUZZLE!";
-
-    vector<string> options;
-    options.push_back("START");
-    options.push_back("LEADERBOARD");
-    options.push_back("CREDIT");
-    options.push_back("QUIT");
-    
-    
-    vector<string> difficulty;
-    difficulty.push_back("EASY");
-    difficulty.push_back("MEDIUM");
-    difficulty.push_back("HARD");
-    difficulty.push_back("CUSTOM");
-
-    int cellRowSize = 3;
-    int cellColumnSize = 15;
-
-    GoTo(0, (WinColumn - gname.length()) / 2);
-    cout << gname;
-
-    int posX = 2, posY = (WinColumn - cellColumnSize) / 2;
-
-    if (page == 4)
-    {
-        for (int i = 0; i < options.size(); i++)
-        {
-            if (choice == i + 1)
-            {
-                drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
-                posX += cellRowSize;
-            }
-            else
-            {
-                drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, white, black);
-                posX += cellRowSize;
-            }
-            
-        }
-    }
-    else if (page == 5)
-    {
-        for (int i = 0; i < difficulty.size(); i++)
-        {
-            if (choice - 1 == i)
-            {
-                drawCell(difficulty[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
-                posX += cellRowSize;
-            }
-            else
-            {
-                drawCell(difficulty[i], posX, posY, cellRowSize, cellColumnSize, white, black);
-                posX += cellRowSize;
-            }
-            
-        }
-    }
-}
-
-void generateMenu(int &page, int &choice)
-{
-    displayMenu(page, choice);
-    char input = getch();
-    input = toupper(input);
-
-    if (page == 4)
-    {
-        switch(input)
-        {
-            case 'W':
-                if (choice > 1)
-                    choice --;
-                break;
-            case 'S':
-                if (choice < 3)
-                    choice ++;
-                break;
-            case ' ':
-                if (choice == 1)
-                    page = 2;
-                else if (choice == 2)
-                    page = 4;
-                else
-                    page = 0;
-                choice = 1;
-                break;
-        }
-    }
-    else if (page == 5)
-    {
-        switch (input)
-        {
-            case 'W':
-                if (choice > 1)
-                    choice --;
-                break;
-            case 'S':
-                if (choice < 4)
-                    choice ++;
-                break;
-            case ' ':
-                page = choice;
-                break;
-        }
-    }
-    else 
-    {
-        cout << "Error!";
-    }
-}
 
 
 int main()

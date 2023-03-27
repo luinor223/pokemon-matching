@@ -31,6 +31,7 @@ void SetColor(int backgound_color = 0, int text_color = 7)
     SetConsoleTextAttribute(hStdout, color_code);
 }
 
+
 // 0 = Black   8 = Gray   
 // 1 = Blue    9 = Light Blue  
 // 2 = Green   10 = Light Green   

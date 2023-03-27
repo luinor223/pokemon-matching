@@ -13,7 +13,6 @@ void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, in
         GoTo(x+i, y);
         for (int j = 0; j < cellSizeColumn; j++)
         {
-            SetColor (text_color, bg_color);
             if (i == 0 && j == 0) 
                 wcout << L"\u250C";
             else if (i == 0 && j == cellSizeColumn - 1)
@@ -30,10 +29,10 @@ void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, in
             {
                 SetColor(bg_color, text_color);
                 wcout << " ";
+                SetColor(0, 7);
             }
         }
     }
-    SetColor(0, 7);
     // Set the output mode back to ASCII for stdout
     _setmode(_fileno(stdout), _O_TEXT);
 

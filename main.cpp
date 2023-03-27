@@ -100,8 +100,8 @@ void checkMatching(char** board, char** background, int bg_row, int bg_column, i
 
     if (res.size() <= 4 && res.size() >= 2) // valid
     {
-        drawMatchingLine(res, offset_x, offset_y, cellSize);
-        this_thread::sleep_for(chrono::seconds(2));
+        //drawMatchingLine(res, offset_x, offset_y, cellSize);
+        this_thread::sleep_for(chrono::seconds(0));
         board[s.x][s.y] = '\0';
         board[f.x][f.y] = '\0';
         clear();
@@ -133,7 +133,7 @@ void drawSelectedPoint(char** board, vector <Point> selectedPoint, int offset_x,
         int x = selectedPoint[i].x;
         int y = selectedPoint[i].y;
         temp = board[x][y];
-        drawCell(temp, offset_x + x*cellSize-x, offset_y + y*(cellSize+2)-y, cellSize, cellSize + 2, 11, 7);
+        drawCell(temp, offset_x + x*cellSize-x, offset_y + y*(cellSize+2)-y, cellSize, cellSize + 3, 11, 7);
     }
 }
 
@@ -150,10 +150,10 @@ void drawNewCurrentSelectedPoint(char** board, int x, int y, int offset_x, int o
     {
         string temp;
         temp = board[original.x][original.y];
-        drawCell(temp, offset_x + original.x*cellSize - original.x, offset_y + original.y*(cellSize + 2) - original.y, cellSize, cellSize + 2); // deselect the old cell
+        drawCell(temp, offset_x + original.x*cellSize - original.x, offset_y + original.y*(cellSize + 3) - original.y, cellSize, cellSize + 3); // deselect the old cell
 
         temp = board[cur.x][cur.y];
-        drawCell(temp, offset_x + cur.x*cellSize - cur.x, offset_y + cur.y*(cellSize + 2) - cur.y, cellSize, cellSize + 2, 7, 0); // select the new one
+        drawCell(temp, offset_x + cur.x*cellSize - cur.x, offset_y + cur.y*(cellSize + 3) - cur.y, cellSize, cellSize + 3, 7, 0); // select the new one
     }
     else // no more cell avaliable, return to the orginal position
         cur = original;
@@ -200,7 +200,7 @@ void playerAction(char** board, int  offset_x, int offset_y, int cellSize)
         }
         break;
     }
-    if (x != 0 || y != 0) // there is an movement input
+    if (x != 0 || y != 0) // there is a movement input
         drawNewCurrentSelectedPoint(board, x, y, offset_x, offset_y, cellSize);
 }
 
@@ -217,7 +217,7 @@ int main()
 
     int cellSize = 5;
     int board_offset_x = (bg_row - row * cellSize) / 2;
-    int board_offset_y = (bg_column - col*cellSize) / 2;
+    int board_offset_y = (bg_column - col*(cellSize + 3)) / 2;
     showBoard(board, row, col, 5, background, bg_row, bg_column);
     while (true)
     {
