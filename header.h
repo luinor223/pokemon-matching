@@ -2,5 +2,6 @@
 //#include "console.cpp"
 #include "account.cpp"
 #include "menu.cpp"
+#include "gameAlgorithms.cpp"
 //#include "background.cpp"
 //#include "draw.cpp"
