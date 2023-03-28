@@ -1,21 +1,21 @@
-//#include "main.h"
+#include "main.h"
 #include "header.h"
 
-bool isInMap(int x, int y)
+bool isInMap(GameState game, int x, int y)
 {
-    return x >= 0 && x < row  && y >= 0 && y < col;
+    return x >= 0 && x < game.row  && y >= 0 && y < game.col;
 }
 
 
-vector<pair<int, int>> findPath(char** board, int _x, int _y, int x, int y)
+vector<pair<int, int>> findPath(GameState game, int _x, int _y, int x, int y)
 {
 	//INIT Graph
-	vector<vector<int>> e(row + 2, vector<int>(col+ 2, 0));
-	for (int i = 0; i < row; ++i)
+	vector<vector<int>> e(game.row + 2, vector<int>(game.col+ 2, 0));
+	for (int i = 0; i < game.row; ++i)
 	{
-		for (int j = 0; j < col; ++j)
+		for (int j = 0; j < game.col; ++j)
 		{
-			e[i + 1][j + 1] = board[i][j] != '\0';
+			e[i + 1][j + 1] = game.board[i][j] != '\0';
 		}
 	}
 	pair<int, int> s = { _x + 1, _y + 1 };
@@ -76,7 +76,7 @@ void drawMatchingLine(vector <pair <int, int> > res, int offset_x, int offset_y,
     }
 }
 
-void checkMatching(char** board, char** background, int bg_row, int bg_column, int offset_x, int offset_y, int cellSize)
+void checkMatching(GameState game, char** background, int bg_row, int bg_column, int offset_x, int offset_y)
 {
     if (selectedPoint.size() < Max_NumofSelectedPoint) // not enough point
         return;
@@ -84,32 +84,30 @@ void checkMatching(char** board, char** background, int bg_row, int bg_column, i
     Point s = selectedPoint[0];
     Point f = selectedPoint[1];
 
-    if (board[s.x][s.y] != board[f.x][f.y]) // different character
+    if (game.board[s.x][s.y] != game.board[f.x][f.y]) // different character
     {  
         clear();
-        showBoard(board, row, col, 5, background, bg_row, bg_column);
+        showBoard(game, background, bg_row, bg_column);
         selectedPoint.clear();
         return;
     }
 
 
     vector <pair<int, int>> res;
-    res = findPath(board, s.x, s.y, f.x, f.y);
+    res = findPath(game, s.x, s.y, f.x, f.y);
 
     if (res.size() <= 4 && res.size() >= 2) // valid
     {
         //drawMatchingLine(res, offset_x, offset_y, cellSize);
         //this_thread::sleep_for(chrono::seconds(2));
 
-        board[s.x][s.y] = '\0';
-        board[f.x][f.y] = '\0';
+        game.board[s.x][s.y] = '\0';
+        game.board[f.x][f.y] = '\0';
         clear();
-        showBoard(board, row, col, 5, background, bg_row, bg_column);
+        showBoard(game, background, bg_row, bg_column);
     }
     selectedPoint.clear();
 }
-
-
 
 bool findPoint(vector <Point> v, Point a)
 {
@@ -119,44 +117,44 @@ bool findPoint(vector <Point> v, Point a)
     return false; 
 }
 
-void drawSelectedPoint(char** board, vector <Point> selectedPoint, int offset_x, int offset_y, int cellSize)
+void drawSelectedPoint(GameState game, vector <Point> selectedPoint, int offset_x, int offset_y)
 {
     string temp; // to convert char to string for drawCell function
     for (int i = 0; i < selectedPoint.size(); i++)
     {
         int x = selectedPoint[i].x;
         int y = selectedPoint[i].y;
-        temp = board[x][y];
-        drawCell(temp, offset_x + x*cellSize-x, offset_y + y*(cellSize+3)-y, cellSize, cellSize + 3, 11, 7);
+        temp = game.board[x][y];
+        drawCell(temp, offset_x + x*game.cellSize-x, offset_y + y*(game.cellSize+3)-y, game.cellSize, game.cellSize + 3, 11, 7);
     }
 }
 
-void drawSelectingPoint(char** board, int x, int y, int offset_x, int offset_y, int cellSize)
+void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y)
 { 
     string temp;
     int mode;
-    temp = board[cur.x][cur.y];
-    if ( board[cur.x][cur.y] == '\0')
+    temp = game.board[cur.x][cur.y];
+    if (game.board[cur.x][cur.y] == '\0')
         mode = 1;
     else
         mode = 0;
-    drawCell(temp, offset_x + cur.x*cellSize - cur.x, offset_y + cur.y*(cellSize + 3) - cur.y, cellSize, cellSize + 3, 0, 7, mode); // deselect the old cell
+    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, 0, 7, mode); // deselect the old cell
 
-    if (isInMap(cur.x + x, cur.y + y)) 
+    if (isInMap(game, cur.x + x, cur.y + y)) 
     {
         cur.x += x;
         cur.y += y;
     } 
 
-    temp = board[cur.x][cur.y];
-    if ( board[cur.x][cur.y] == '\0')
+    temp = game.board[cur.x][cur.y];
+    if (game.board[cur.x][cur.y] == '\0')
         mode = 1;
     else
         mode = 0;
-    drawCell(temp, offset_x + cur.x*cellSize - cur.x, offset_y + cur.y*(cellSize + 3) - cur.y, cellSize, cellSize + 3, 7, 0, mode); // select the new one
+    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, 7, 0, mode); // select the new one
 }
 
-void playerAction(char** board, int  offset_x, int offset_y, int cellSize) 
+void playerAction(GameState game, int  offset_x, int offset_y, int &page) 
 {
     char c = getch(); // get direct input
     int x = 0, y = 0;
@@ -175,7 +173,7 @@ void playerAction(char** board, int  offset_x, int offset_y, int cellSize)
         break;
     case ' ':
         {
-            if (board[cur.x][cur.y] != '\0') // if the cur cell has block
+            if (game.board[cur.x][cur.y] != '\0') // if the cur cell has block
             {
                 if (findPoint(selectedPoint, cur) == true) // if already selected
                 {
@@ -194,36 +192,74 @@ void playerAction(char** board, int  offset_x, int offset_y, int cellSize)
             }
         }
         break;
+    case 27: //Esc = 27
+        page = 1;
     }
     if (x != 0 || y != 0) // there is a movement input
-        drawSelectingPoint(board, x, y, offset_x, offset_y, cellSize);
+        drawSelectingPoint(game, x, y, offset_x, offset_y);
 }
 
 int main()
 {
-    char** board;
-    init_board(board);
-    make_board(board, row, col);
-    SetWindowSize(400, 400);
+    SetWindowSize(WinColumn, WinRow);
+
+    GameState game;
+    savefile player;
 
     char** background;
-    int bg_row = row, bg_column = col;
-    getFileContent(background, bg_row, bg_column, 5);
+    int bg_row, bg_column;
+    int board_offset_x, board_offset_y;
+    //showBoard(game, background, bg_row, bg_column);
 
-    int cellSize = 5;
-    int board_offset_x = (bg_row - row * cellSize) / 2;
-    int board_offset_y = (bg_column - col*(cellSize + 3)) / 2;
-    showBoard(board, row, col, 5, background, bg_row, bg_column);
+    int page = 1;
+    int choice = 1;
+    bool initialized = false;
+
+    //displayLoginRegisterMenu(player);
     while (true)
     {
-        checkMatching(board, background, bg_row, bg_column, board_offset_x, board_offset_y, cellSize);
-        drawSelectedPoint(board, selectedPoint, board_offset_x, board_offset_y, cellSize);
-        drawSelectingPoint(board, 0, 0, board_offset_x, board_offset_y, cellSize);
-        //showBoard(board, row, col, 5, background, bg_row, bg_column);
-        playerAction(board, board_offset_x, board_offset_y, cellSize);
+        while(page <= 5)
+        {
+            generateMenu(game, page, choice);
+        }
+        if (page == 6)
+        {
+            if ( initialized == false)
+            {
+                clear();
+                bg_row = game.row;
+                bg_column = game.col;
+                
+                getFileContent(background, bg_row, bg_column, game.cellSize);
+                make_board(game);
+                board_offset_x = (bg_row - game.row * (game.cellSize - 1) - 1) / 2;
+                board_offset_y = (bg_column - game.col*(game.cellSize + 3 - 1) - 1) / 2;
+                board_offset_x = (board_offset_x < 0) ? 0 : board_offset_x;
+                board_offset_y = (board_offset_y < 0) ? 0 : board_offset_y;
+
+                //drawCell(" ", 0, 0, WinRow, WinColumn);
+                showBoard(game, background, bg_row, bg_column);
+                
+                initialized = true;
+            }
+            while (initialized == true)
+            {
+                checkMatching(game, background, bg_row, bg_column, board_offset_x, board_offset_y);
+                drawSelectedPoint(game, selectedPoint, board_offset_x, board_offset_y);
+                drawSelectingPoint(game, 0, 0, board_offset_x, board_offset_y);
+                playerAction(game, board_offset_x, board_offset_y, page);
+
+                if (page == 1) //Player go back to menu
+                {
+                    deleteBg(background, bg_row);
+                    deleteMemBoard(game);
+                    initialized = false;
+                }
+            }
+        }
     }
 
     deleteBg(bg_row, bg_column, background);
-    deleteMemBoard(board, row, col);
+    deleteMemBoard(game);
     return 0;
 }

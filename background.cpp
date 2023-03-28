@@ -44,8 +44,8 @@ void printBg(char** background, int bg_row, int bg_column)
     }
 }
 
-void deleteBg(int m, int n, char **&background){
-    for (int i = 0; i < 5 * (m + 2); i++)
+void deleteBg(char **&background, int bg_row){
+    for (int i = 0; i < bg_row; i++)
         delete[] background[i];
     delete[] background;
 }

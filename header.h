@@ -1,3 +1,6 @@
-#pragma once
 #include "board.cpp"
-#include "console.h"
+//#include "console.cpp"
+#include "account.cpp"
+#include "menu.cpp"
+//#include "background.cpp"
+//#include "draw.cpp"

@@ -175,21 +175,22 @@ void displayLoginRegisterMenu(savefile &player)
     }
 }
 
+void saveGame(savefile player, char** board);
 
 
-int main()
-{
-    SetWindowSize(120, 30);
-    // clear();
-    // int page = 1, choice = 1;
-    // while (page <= 4 && choice <= 4)
-    // {
-    //     generateMenu(page, choice);
-    //     if (page == 0)
-    //         break;
-    // }
-    savefile player;
-    displayLoginRegisterMenu(player);
+// int main()
+// {
+//     SetWindowSize(120, 30);
+//     // clear();
+//     // int page = 1, choice = 1;
+//     // while (page <= 4 && choice <= 4)
+//     // {
+//     //     generateMenu(page, choice);
+//     //     if (page == 0)
+//     //         break;
+//     // }
+//     savefile player;
+//     displayLoginRegisterMenu(player);
 
-    return 0;
-}
+//     return 0;
+// }

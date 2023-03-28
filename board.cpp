@@ -1,34 +1,39 @@
-#include "main.h"
 #include "board.h"
-#include "background.cpp"
-#include "console.cpp"
-#include "draw.cpp"
 
-void init_board(char** &board)
+void memAllcBoard(GameState a)
 {
-    cout << "rows : ";
-    cin >> row;
-    cout << "col : ";
-    cin >> col;
-
-    board = new char*[row];
+    a.board = new char*[row];
     for (int i = 0; i < row; i++)
-        board[i] = new char[col];
-
-  
+        a.board[i] = new char[col];
 }
 
-void make_board(char** &board, int m, int n) {
+void make_board(GameState &game) {
     srand(time(NULL));
     char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L', 'K' , 'I'};
     int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
-
-    //board = new char *[m];
-    vector<pair<int, int>> avail_pos;
-    for (int i = 0; i < m; i++)
+    
+    switch (game.difficulty)
     {
-        //board[i] = new char[n]; 
-        for (int j = 0; j < n; j++)
+        case 1:
+            game.row = 4;
+            game.col = 6;
+            break;
+        case 2:
+            game.row = 6;
+            game.col = 8;
+            break;
+        case 3:
+            game.row = 8;
+            game.col = 10;
+            break;
+    }
+
+    game.board = new char *[game.row];
+    vector<pair<int, int>> avail_pos;
+    for (int i = 0; i < game.row; i++)
+    {
+        game.board[i] = new char[game.col]; 
+        for (int j = 0; j < game.col; j++)
         {
             avail_pos.push_back(make_pair(i, j));
         } 
@@ -44,8 +49,8 @@ void make_board(char** &board, int m, int n) {
             pos2 = rand() % avail_pos.size(); // select next position
         }
 
-        board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
-        board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
+        game.board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
+        game.board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
 
         avail_pos.erase(avail_pos.begin() + max(pos1, pos2));
 
@@ -53,33 +58,36 @@ void make_board(char** &board, int m, int n) {
     }
 }
 
-void deleteMemBoard(char** &board, int m, int n)
+void deleteMemBoard(GameState &game)
 {
-    for (int i = 0; i < m; i++)
-        delete[] board[i];
+    for (int i = 0; i < game.row; i++)
+        delete[] game.board[i];
     
-    delete[] board;
+    delete[] game.board;
 }
 
-void showBoard(char** board, int row, int column, int cellSize, char** background, int bg_row, int bg_column)
+void showBoard(GameState game, char** background, int bg_row, int bg_column)
 {
     GoTo(0, 0);
     printBg(background, bg_row, bg_column);
 
-    int offset_x = (bg_row - row * cellSize) / 2;
-    int offset_y = (bg_column - column*(cellSize + 3)) / 2;
+    int rowSize = game.cellSize;
+    int colSize = rowSize + 3;
+
+    int offset_x = (bg_row - game.row * (rowSize - 1) - 1)/ 2;
+    int offset_y = (bg_column - game.col * (colSize - 1) - 1) / 2;
     offset_x = (offset_x < 0) ? 0 : offset_x;
     offset_y = (offset_y < 0) ? 0 : offset_y;
     GoTo(offset_x, offset_y);
     
-    for (int i = 0; i < row; i++)
+    for (int i = 0; i < game.row; i++)
     {
-        for (int j = 0; j < column; j++)
+        for (int j = 0; j < game.col; j++)
         {
             string s;
-            s = board[i][j];
-            if(board[i][j] != '\0'){
-                drawCell(s, offset_x + i*cellSize-i, offset_y + j*(cellSize + 3)-j, cellSize, cellSize + 3);
+            s = game.board[i][j];
+            if(game.board[i][j] != '\0'){
+                drawCell(s, offset_x + i*(rowSize-1), offset_y + j*(colSize)-j, rowSize, colSize);
             }
         }
     }

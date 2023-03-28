@@ -22,12 +22,20 @@ using namespace std;
 
 bool isSelected[MAX][MAX];
 int row, col;
-int WinColumn = 120;
-int WinRow = 60;
+const int WinColumn = 120;
+const int WinRow = 30;
 
 const int white = 7;
 const int black = 0;
 const int yellow = 6;
+
+struct GameState{
+    char** board = nullptr;
+    int row = 4;
+    int col = 6;
+    int difficulty = 0; //1: Easy,  2: Medium,  3: Hard
+    int cellSize = 5;
+};
 
 struct Point{
     int x, y;
