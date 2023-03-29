@@ -17,7 +17,7 @@ int main()
     int choice = 1;
     bool initialized = false;
 
-    //displayLoginRegisterMenu(player);
+   // displayLoginRegisterMenu(player);
     while (true)
     {
         while(page <= 5)

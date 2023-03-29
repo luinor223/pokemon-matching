@@ -136,6 +136,7 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
         mode = 1;
     else
         mode = 0;
+    // deselecting the old cell
     drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, 0, 7, mode); // deselect the old cell
 
     if (isInMap(game, cur.x + x, cur.y + y)) 
@@ -143,12 +144,24 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
         cur.x += x;
         cur.y += y;
     } 
+    else
+    {
+        if (cur.x + x >= game.row)
+            cur.x = 0;
+        else if (cur.x + x < 0)
+            cur.x = game.row - 1;
+        else if (cur.y + y >= game.col)
+            cur.y = 0;
+        else if (cur.y + y < 0)
+            cur.y = game.col - 1;
+    }
 
     temp = game.board[cur.x][cur.y];
     if (game.board[cur.x][cur.y] == '\0')
         mode = 1;
     else
         mode = 0;
+    // selecting the new cell
     drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, 7, 0, mode); // select the new one
 }
 
