@@ -57,11 +57,14 @@ int main()
             while (initialized == true && time_left > 0)
             {
                 updateTime(game, time_left, start_time);
-                checkMatching(game, background, bg_row, bg_column, board_offset_x, board_offset_y);
-                drawSelectedPoint(game, selectedPoint, board_offset_x, board_offset_y);
-                drawSelectingPoint(game, 0, 0, board_offset_x, board_offset_y);
+                
                 if (kbhit())
+                {
                     playerAction(game, board_offset_x, board_offset_y, page);
+                    checkMatching(game, background, bg_row, bg_column, board_offset_x, board_offset_y);
+                    drawSelectedPoint(game, selectedPoint, board_offset_x, board_offset_y);
+                    drawSelectingPoint(game, 0, 0, board_offset_x, board_offset_y);
+                }
 
                 if (page == 1) //Player go back to menu
                 {
