@@ -10,6 +10,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <io.h>
+#include <ctime>
 
 #define MAX 12
 #define PADDING 500 // bytes
@@ -20,10 +21,8 @@
 
 using namespace std;
 
-bool isSelected[MAX][MAX];
-int row, col;
 const int WinColumn = 120;
-const int WinRow = 30;
+const int WinRow = 40;
 
 const int white = 7;
 const int black = 0;
@@ -35,6 +34,8 @@ struct GameState{
     int col = 6;
     int difficulty = 0; //1: Easy,  2: Medium,  3: Hard
     int cellSize = 5;
+    double total_time = 180;
+    int level = 1;
 };
 
 struct Point{

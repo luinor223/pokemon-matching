@@ -1,1 +1,1 @@
- - cur.x
+int(time_left * (total_time /(WinColumn - 20.0)) + 11)

@@ -8,11 +8,8 @@ Page 5 = Show game credit
 Page 6 = Gameplay
 */
 
-void displayMenu(GameState &game, int page, int choice)
+void displayMenu(GameState &game, int page, int choice, char** title, int title_row, int title_col)
 {
-    clear();
-    string gname = "POKEMON PUZZLE!";
-
     vector<string> options;
     options.push_back("START");
     options.push_back("LEADERBOARD");
@@ -29,10 +26,22 @@ void displayMenu(GameState &game, int page, int choice)
     int cellRowSize = 3;
     int cellColumnSize = 15;
 
-    GoTo(0, (WinColumn - gname.length()) / 2);
-    cout << gname;
+    //GoTo(0, (WinColumn - 67) / 2);
+    for (int i = 0; i < title_row; i++)
+    {
+        GoTo(i, (WinColumn - 67) / 2);
+        for (int j = 0; j < title_col; j++)
+        {
+            if (title[i][j] == '#')
+                SetColor(0, 6);
+            else
+                SetColor(0, 1);
+            cout << title[i][j];
+        }
+    }
+    SetColor();
 
-    int posX = 2, posY = (WinColumn - cellColumnSize) / 2;
+    int posX = title_row + 2, posY = (WinColumn - cellColumnSize) / 2;
 
     if (page == 1)
     {
@@ -92,12 +101,23 @@ void displayMenu(GameState &game, int page, int choice)
         cout << " >";
 
         SetColor(0, 7); //Set Color back to default
+    }
+    else if (page == 5)  //Credit
+    {
+        GoTo(2, (WinColumn - 6) / 2);
+        cout << "Custom";
+
+        GoTo(3, (WinColumn - 36) / 2);
+        cout << "22127258 - Le Tri Man - 22CLC10 - HCMUS";
+        
+        GoTo(4, (WinColumn - 36) / 2);
+        cout << "22127452 - Le Ngoc Vi - 22CLC10 - HCMUS";
     } 
 }
 
-void generateMenu(GameState &game, int &page, int &choice)
+void generateMenu(GameState &game, int &page, int &choice, char** title, int title_row, int title_col)
 {
-    displayMenu(game, page, choice);
+    displayMenu(game, page, choice, title, title_row, title_col);
 
     char input = getch();
     input = toupper(input);
@@ -116,11 +136,20 @@ void generateMenu(GameState &game, int &page, int &choice)
                 break;
             case ' ':
                 if (choice == 1) //Start
+                {
+                    clear();
                     page = 2;
+                }
                 else if (choice == 2) //Leaderboard
+                {   
+                    clear();
                     page = 4;
+                }
                 else if (choice == 3) //Credit
+                {
+                    clear();
                     page = 5;
+                }
                 else    //Quit
                     page = 0;
                 choice = 1;
@@ -198,36 +227,17 @@ void generateMenu(GameState &game, int &page, int &choice)
     }
     else if (page == 4)
     {
-        cout << "Page under construction.";
         if (input == 27)
             page = 1;
     }
     else if (page == 5)
     {
-        cout << "Page under construction.";
         if (input == 27)
             page = 1;
     }
     else 
     {
-        cout << "Error!";
         if (input == 27)
             page = 1;
     }
 }
-
-
-// int main()
-// {
-//     SetWindowSize(120, 30);
-//     // clear();
-//     // int page = 1, choice = 1;
-//     // while (page <= 4 && choice <= 4)
-//     // {
-//     //     generateMenu(page, choice);
-//     //     if (page == 0)
-//     //         break;
-//     // }
-
-//     return 0;
-// }

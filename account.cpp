@@ -101,7 +101,7 @@ void displayForm(savefile player,int choice, bool &isLogged)
     GoTo(7, (WinColumn - 10 - box_size) / 2 + 12);
     cin.getline(player.password, 20);
 
-    GoTo(9, (WinColumn - 10 - box_size) / 2 + 12);
+    GoTo(9, (WinColumn - 50 - box_size) / 2 + 12);
 
     if (choice == 1)
         processLogin(player, isLogged);

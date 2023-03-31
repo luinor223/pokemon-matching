@@ -68,9 +68,8 @@ void drawMatchingLine(vector <pair <int, int> > res, int offset_x, int offset_y,
             s = "|";
         else // horizontal change
             s = '_'; 
-    cout << "AAAAAAAA";
-        drawLine(res[i-1].first + offset_x + res[i-1].first*cellSize, res[i-1].second + offset_y + res[i-1].second*(cellSize+3), 
-                res[i].first + offset_x + res[i].first*cellSize, res[i].second + offset_y + res[i].second*(cellSize+3), s);
+        drawLine(offset_x + res[i-1].first*(cellSize-1) + (cellSize/2 + 1), offset_y + res[i-1].second*(cellSize+3-1) + ((cellSize+2)/2), 
+                 offset_x + res[i].first*(cellSize-1) + (cellSize/2 + 1) , offset_y + res[i].second*(cellSize+3-1) + ((cellSize+2)/2) , s);
     }
 }
 
@@ -84,8 +83,8 @@ void checkMatching(GameState game, char** background, int bg_row, int bg_column,
 
     if (game.board[s.x][s.y] != game.board[f.x][f.y]) // different character
     {  
-        clear();
-        showBoard(game, background, bg_row, bg_column);
+        //clear();
+        showBoard(game, background, bg_row, bg_column, offset_x, offset_y);
         selectedPoint.clear();
         return;
     }
@@ -101,8 +100,8 @@ void checkMatching(GameState game, char** background, int bg_row, int bg_column,
 
         game.board[s.x][s.y] = '\0';
         game.board[f.x][f.y] = '\0';
-        clear();
-        showBoard(game, background, bg_row, bg_column);
+        //clear();
+        showBoard(game, background, bg_row, bg_column, offset_x, offset_y);
     }
     selectedPoint.clear();
 }

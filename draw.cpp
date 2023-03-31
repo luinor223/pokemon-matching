@@ -37,8 +37,6 @@ void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, in
         }
         // Set the output mode back to ASCII for stdout
         _setmode(_fileno(stdout), _O_TEXT);
-
-        
     }
     else // mode = 1 : highlight the cell
     {
@@ -62,7 +60,7 @@ void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, in
 
 void drawLine(int x1, int y1, int x2, int y2, string lineChar)
 {
-    while (x1 != x2 && y1 != y2)
+    while (x1 != x2 || y1 != y2)
     {
         if (x1 < x2)
             x1++;
@@ -75,6 +73,8 @@ void drawLine(int x1, int y1, int x2, int y2, string lineChar)
             y1--;
 
         GoTo(x1, y1);
-        cout << lineChar;
+         _setmode(_fileno(stdout), _O_U16TEXT);
+        wcout << L"\u25A0";
+         _setmode(_fileno(stdout), _O_TEXT);
     }
 }

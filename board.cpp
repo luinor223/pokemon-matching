@@ -1,12 +1,5 @@
 #include "board.h"
 
-void memAllcBoard(GameState a)
-{
-    a.board = new char*[row];
-    for (int i = 0; i < row; i++)
-        a.board[i] = new char[col];
-}
-
 void make_board(GameState &game) {
     srand(time(NULL));
     char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L', 'K' , 'I'};
@@ -17,14 +10,17 @@ void make_board(GameState &game) {
         case 1:
             game.row = 4;
             game.col = 6;
+            game.total_time = 120;
             break;
         case 2:
             game.row = 6;
             game.col = 8;
+            game.total_time = 180;
             break;
         case 3:
             game.row = 8;
             game.col = 10;
+            game.total_time = 240;
             break;
     }
 
@@ -66,18 +62,13 @@ void deleteMemBoard(GameState &game)
     delete[] game.board;
 }
 
-void showBoard(GameState game, char** background, int bg_row, int bg_column)
+void showBoard(GameState game, char** background, int bg_row, int bg_column, int offset_x, int offset_y)
 {
-    GoTo(0, 0);
     printBg(background, bg_row, bg_column);
 
     int rowSize = game.cellSize;
     int colSize = rowSize + 3;
 
-    int offset_x = (bg_row - game.row * (rowSize - 1) - 1)/ 2;
-    int offset_y = (bg_column - game.col * (colSize - 1) - 1) / 2;
-    offset_x = (offset_x < 0) ? 0 : offset_x;
-    offset_y = (offset_y < 0) ? 0 : offset_y;
     GoTo(offset_x, offset_y);
     
     for (int i = 0; i < game.row; i++)
