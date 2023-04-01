@@ -37,7 +37,7 @@ int main()
         }
         if (page == 6)
         {
-            if ( initialized == false)
+            if (initialized == false)
             {
                 clear();
                 time_left = 10;
@@ -61,7 +61,7 @@ int main()
                 if (kbhit())
                 {
                     playerAction(game, board_offset_x, board_offset_y, page);
-                    checkMatching(game, background, bg_row, bg_column, board_offset_x, board_offset_y);
+                    checkMatching(game, background, bg_row, bg_column, board_offset_x, board_offset_y, game.cellSize);
                     drawSelectedPoint(game, selectedPoint, board_offset_x, board_offset_y);
                     drawSelectingPoint(game, 0, 0, board_offset_x, board_offset_y);
                 }

@@ -7,4 +7,4 @@ void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, in
 // mode = 1, highlight the cell
 
 
-void drawLine(int x1, int y1, int x2, int y2, string lineChar);
+void drawLine(int x1, int y1, int x2, int y2, int mode);

@@ -5,6 +5,84 @@ bool isInMap(GameState game, int x, int y)
     return x >= 0 && x < game.row  && y >= 0 && y < game.col;
 }
 
+void setBoard(GameState game, int gameMode)
+{
+    if (gameMode == 0) // không thụt
+        return;
+    if (gameMode == 1) // thụt trái
+    {
+        for (int i = 0; i < game.row; i++)
+        {
+            for (int j = 0; j < game.col; j++)
+            {
+                if (game.board[i][j] == '\0')
+                {
+                    for (int k = j+1; k < game.col; k++)
+                        if (game.board[i][k] != '\0')
+                        {
+                            swap(game.board[i][j], game.board[i][k]);
+                            break;
+                        }
+                }
+            }
+        }          
+    }
+    if (gameMode == 2) // thụt phải
+    {
+        for (int i = 0; i < game.row; i++)
+        {
+            for (int j = game.col - 1; j >= 0; j--)
+            {
+                if (game.board[i][j] == '\0')
+                {
+                    for (int k = j-1; k >= 0; k--)
+                        if (game.board[i][k] != '\0')
+                        {
+                            swap(game.board[i][j], game.board[i][k]);
+                            break;
+                        }
+                }
+            }
+        }  
+    }
+    if (gameMode == 3) // thụt trên
+    {
+        for (int j = 0; j < game.col; j++)
+        {
+            for (int i = 0; i < game.row; i++)
+            {
+                if (game.board[i][j] == '\0')
+                {
+                    for (int k = i+1; k < game.row; k++)
+                        if (game.board[k][j] != '\0')
+                        {
+                            swap(game.board[i][j], game.board[k][j]);
+                            break;
+                        }
+                }
+            }
+        }  
+    }
+    if (gameMode == 4) // thut dưới
+    {
+        for (int j = 0; j < game.col; j++)
+        {
+            for (int i =  game.row - 1; i >= 0; i--)
+            {
+                if (game.board[i][j] == '\0')
+                {
+                    for (int k = i-1; k >= 0; k--)
+                        if (game.board[k][j] != '\0')
+                        {
+                            swap(game.board[i][j], game.board[k][j]);
+                            break;
+                        }
+                }
+            }
+        }  
+    }
+}
+
 vector<pair<int, int>> findPath(GameState game, int _x, int _y, int x, int y)
 {
 	//INIT Graph
@@ -32,7 +110,7 @@ vector<pair<int, int>> findPath(GameState game, int _x, int _y, int x, int y)
 		pair <int, int> u = q.front();
 		q.pop();
 		if (u == s) break;
-		for (int i = 0; i < 4; ++i) {
+		for (int i = 0; i < 4; ++i){
 			int x = u.first + dx[i];
 			int y = u.second + dy[i];
 			while (x >= 0 && x < e.size() && y >= 0 && y < e[0].size() && e[x][y] == 0) {
@@ -48,7 +126,7 @@ vector<pair<int, int>> findPath(GameState game, int _x, int _y, int x, int y)
 
 	//trace back
 	vector<pair<int, int>> res;
-	if (trace[s.first][s.second].first != -1) {
+	if (trace[s.first][s.second].first != -1){
 		while (s.first != -2) {
 			res.push_back({ s.first - 1, s.second - 1 });
 			s = trace[s.first][s.second];
@@ -61,19 +139,20 @@ void drawMatchingLine(vector <pair <int, int> > res, int offset_x, int offset_y,
 {
     for (int i = 1; i < res.size(); i++)
     {
+        int mode;
         int diff_x = res[i].first - res[i-1].first;
         int diff_y = res[i].second - res[i-1].second;
         string s;
         if (diff_x != 0) // vertical change
-            s = "|";
+            mode = 0;
         else // horizontal change
-            s = '_'; 
-        drawLine(offset_x + res[i-1].first*(cellSize-1) + (cellSize/2 + 1), offset_y + res[i-1].second*(cellSize+3-1) + ((cellSize+2)/2), 
-                 offset_x + res[i].first*(cellSize-1) + (cellSize/2 + 1) , offset_y + res[i].second*(cellSize+3-1) + ((cellSize+2)/2) , s);
+            mode = 1; 
+        drawLine(offset_x + res[i-1].first*(cellSize-1) + (cellSize/2), offset_y + res[i-1].second*(cellSize+3-1) + ((cellSize+2)/2), 
+                 offset_x + res[i].first*(cellSize-1) + (cellSize/2) , offset_y + res[i].second*(cellSize+3-1) + ((cellSize+2)/2) , mode);
     }
 }
 
-void checkMatching(GameState game, char** background, int bg_row, int bg_column, int offset_x, int offset_y)
+void checkMatching(GameState game, char** background, int bg_row, int bg_column, int offset_x, int offset_y, int cellSize)
 {
     if (selectedPoint.size() < Max_NumofSelectedPoint) // not enough point
         return;
@@ -83,7 +162,6 @@ void checkMatching(GameState game, char** background, int bg_row, int bg_column,
 
     if (game.board[s.x][s.y] != game.board[f.x][f.y]) // different character
     {  
-        //clear();
         showBoard(game, background, bg_row, bg_column, offset_x, offset_y);
         selectedPoint.clear();
         return;
@@ -95,14 +173,23 @@ void checkMatching(GameState game, char** background, int bg_row, int bg_column,
 
     if (res.size() <= 4 && res.size() >= 2) // valid
     {
-        //drawMatchingLine(res, offset_x, offset_y, cellSize);
-        //this_thread::sleep_for(chrono::seconds(2));
+        string temp;
+        temp = game.board[s.x][s.y];
+        drawCell(temp, offset_x + s.x*(game.cellSize-1), offset_y + s.y*(game.cellSize + 2), game.cellSize, game.cellSize + 3); // deselecting start cell
+        
+        temp = game.board[f.x][f.y];
+        drawCell(temp, offset_x + f.x*(game.cellSize  - 1), offset_y + f.y*(game.cellSize + 2), game.cellSize, game.cellSize + 3); // deselecting end cell
+        
+        drawMatchingLine(res, offset_x, offset_y, cellSize);
+        this_thread::sleep_for(200ms);
 
         game.board[s.x][s.y] = '\0';
         game.board[f.x][f.y] = '\0';
-        //clear();
-        showBoard(game, background, bg_row, bg_column, offset_x, offset_y);
+        setBoard(game, 4); // thụt lùi theo gameMode
+        printBg(background, bg_row, bg_column);
+        //showBoard(game, background, bg_row, bg_column, offset_x, offset_y);
     }
+    showBoard(game, background, bg_row, bg_column, offset_x, offset_y);
     selectedPoint.clear();
 }
 
@@ -111,7 +198,7 @@ bool findPoint(vector <Point> v, Point a)
     for (int i = 0; i < v.size(); i++)
         if (v[i].x == a.x && v[i].y == a.y)
             return true;
-    return false; 
+    return false;
 }
 
 void drawSelectedPoint(GameState game, vector <Point> selectedPoint, int offset_x, int offset_y)
@@ -122,12 +209,12 @@ void drawSelectedPoint(GameState game, vector <Point> selectedPoint, int offset_
         int x = selectedPoint[i].x;
         int y = selectedPoint[i].y;
         temp = game.board[x][y];
-        drawCell(temp, offset_x + x*game.cellSize-x, offset_y + y*(game.cellSize+3)-y, game.cellSize, game.cellSize + 3, 11, 7);
+        drawCell(temp, offset_x + x*game.cellSize-x, offset_y + y*(game.cellSize+3)-y, game.cellSize, game.cellSize + 3, 7, 0);
     }
 }
 
 void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y)
-{ 
+{
     string temp;
     int mode;
     temp = game.board[cur.x][cur.y];
@@ -136,8 +223,7 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
     else
         mode = 0;
     // deselecting the old cell
-    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, 0, 7, mode); // deselect the old cell
-
+    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, 0, 7, mode);
     if (isInMap(game, cur.x + x, cur.y + y)) 
     {
         cur.x += x;
@@ -154,7 +240,7 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
         else if (cur.y + y < 0)
             cur.y = game.col - 1;
     }
-
+    
     temp = game.board[cur.x][cur.y];
     if (game.board[cur.x][cur.y] == '\0')
         mode = 1;
@@ -162,6 +248,44 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
         mode = 0;
     // selecting the new cell
     drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, 7, 0, mode); // select the new one
+}
+
+void moveSuggestion(GameState game, int offset_x, int offset_y)
+{
+    for (int i = 0; i < game.row; i++)
+    {
+        for (int j = 0; j < game.col; j++)
+        {
+            int startX = i, startY = j;
+            for (int i = 0; i < game.row; i++)
+            {
+                for (int j = 0; j < game.col; j++)
+                {
+                    if (i == startX && j == startY)
+                        continue;
+                    if (game.board[startX][startY] != game.board[i][j])
+                        continue;
+                    if (game.board[i][j] == '\0')
+                        continue;
+
+                    vector <pair <int, int> > res;
+                    res = findPath(game, startX, startY, i, j);
+
+                    if (res.size() <= 4 && res.size() >= 2) // valid path
+                    {
+                        string temp;
+                        temp = game.board[startX][startY];
+                        drawCell(temp, offset_x + startX*game.cellSize - startX, offset_y + startY*(game.cellSize + 3) - startY, game.cellSize, game.cellSize + 3, 10, 0);
+                        return;
+                    }
+
+                }
+            }
+        }
+    }
+    
+    // If there is no possible move
+    // do something...
 }
 
 void playerAction(GameState game, int  offset_x, int offset_y, int &page) 
@@ -204,6 +328,10 @@ void playerAction(GameState game, int  offset_x, int offset_y, int &page)
         break;
     case 27: //Esc = 27
         page = 1;
+        break;
+    case 'h':
+        moveSuggestion(game, offset_x, offset_y);
+        break;
     }
     if (x != 0 || y != 0) // there is a movement input
         drawSelectingPoint(game, x, y, offset_x, offset_y);

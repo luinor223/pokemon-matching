@@ -78,7 +78,7 @@ void showBoard(GameState game, char** background, int bg_row, int bg_column, int
             string s;
             s = game.board[i][j];
             if(game.board[i][j] != '\0'){
-                drawCell(s, offset_x + i*(rowSize-1), offset_y + j*(colSize)-j, rowSize, colSize);
+                drawCell(s, offset_x + i*(rowSize)-i, offset_y + j*(colSize)-j, rowSize, colSize);
             }
         }
     }

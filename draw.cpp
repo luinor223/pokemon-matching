@@ -58,23 +58,34 @@ void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, in
     SetColor(0, 7);    
 }
 
-void drawLine(int x1, int y1, int x2, int y2, string lineChar)
+void drawLine(int x1, int y1, int x2, int y2, int mode)
 {
-    while (x1 != x2 || y1 != y2)
+    if (mode == 0)  // vertical line
     {
-        if (x1 < x2)
-            x1++;
-        else if (x1 > x2)
-            x1--;
-        
-        if (y1 < y2)
-            y1++;
-        else if (y1 > y2)
-            y1--;
-
-        GoTo(x1, y1);
-         _setmode(_fileno(stdout), _O_U16TEXT);
-        wcout << L"\u25A0";
-         _setmode(_fileno(stdout), _O_TEXT);
+        while (abs(x1-x2) > 1)
+        {
+            if (x1 < x2)
+                x1++;
+            else 
+                x1--;
+            GoTo(x1, y1);
+            _setmode(_fileno(stdout), _O_U16TEXT);
+            wcout << L"\u25A0";
+            _setmode(_fileno(stdout), _O_TEXT);
+        }
+    }
+    else // mode = 1 : horizontal line
+    {
+        while (abs(y1-y2) > 1)
+        {
+            if (y1 < y2)
+                y1+=2;
+            else
+                y1-=2;
+            GoTo(x1, y1);
+            _setmode(_fileno(stdout), _O_U16TEXT);
+            wcout << L"\u25A0";
+            _setmode(_fileno(stdout), _O_TEXT);
+        }
     }
 }
