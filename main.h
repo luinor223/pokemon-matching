@@ -34,8 +34,16 @@ struct GameState{
     int col = 6;
     int difficulty = 0; //1: Easy,  2: Medium,  3: Hard
     int cellSize = 5;
-    double total_time = 180;
-    int level = 1;
+    double total_time = 0;
+    int mode = 1;
+    int stage = 1;
+};
+
+struct PlayerState {
+    int score = 0;
+    int time_left = 10;
+    int help_count = 3;
+    int shuffle_count =3;
 };
 
 struct Point{
@@ -47,16 +55,33 @@ int Max_NumofSelectedPoint = 2;
 vector <Point> selectedPoint;
 
 struct State{ //Representing a board state
-    int row = 4;
-    int column = 6; // Size of the board game
-    int cur_x = 1;
-    int cur_y = 1; // Current cursor position
-    char board[100] = {0}; // Current board state
-// 500 byte NULL
+    int row, col; // Size of the board game
+    int cur_x, cur_y; // Current cursor position
+    char board[BOARDSIZE] = {0}; // Current board state
+    char file_background[URLSIZE] = {0}; // Link to background file. This variable’s value is NULL if there is no current background
+    // Extra variables
+    int time_left = 120;
+    int score = 0;
+    int difficulty = 0;
+    int mode = 1;
+    int stage = 1;
+    //500 - (sizeof(int)) * 5 = 480
 };
 
+struct Date{
+    int dd, mm, yy;
+};
+
+
+struct Record{
+    Date date; // Date of completed record
+    int points; // points achieved
+    // 500 byte NULL
+};
+
+
 struct savefile{
-    //char mask; // You are required to transfer all char-type variables by performing xor each with the mask-variable, bit-by-bit.
+    char mask; // You are required to transfer all char-type variables by performing xor each with the mask-variable, bit-by-bit.
     char name[20]; // username
     char password[20]; // password
     // 500 byte NULL

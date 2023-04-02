@@ -12,7 +12,7 @@ void displayGameUI(GameState game)
     drawCell(" ", 35, 0, 5, WinColumn);
 
     GoTo(1, (WinColumn + 68) / 2);
-    cout << "Level 1";
+    cout << "Stage " << game.stage;
 
     GoTo(5, 75);
     cout << "Score: ";
@@ -72,34 +72,39 @@ void displayGameUI(GameState game)
     }
 }
 
-void updateTime(GameState game, int &time_left, int start_time)
+void updateUI(GameState game, PlayerState &player, int start_time)
 {
+    GoTo(5, 82);
+    cout << player.score;
+
+    GoTo(6, 98);
+    cout << player.help_count;
+    
+    GoTo(7, 98);
+    cout << player.shuffle_count;
 
     time_t current_time = time(0);
-    time_left = (int)game.total_time - (difftime(current_time, start_time));
+    player.time_left = (int)game.total_time - (difftime(current_time, start_time));
     
-    if (time_left < game.total_time)
+    if (player.time_left < game.total_time)
     {
-        GoTo(37, int(time_left/game.total_time * (WinColumn - 20)) + 14);
+        GoTo(37, int(player.time_left/game.total_time * (WinColumn - 20)) + 14);
         for (int i = 0; i < (WinColumn - 20) / game.total_time; i++)
             cout << " ";
     }
 }
 
-// int main()
-// {
-//     GameState game;
-//     ShowConsoleCursor(false);
-//     displayGameUI(game);
-//     time_t start_time = time(0);
-//     int timeleft = 10;
-//     game.difficulty = 3;
-//     while (timeleft > 0)
-//     {
-//         updateTime(game, timeleft, start_time);
-//     }
+void displayGameOver(PlayerState player)
+{
+    drawCell(" ", (WinRow - 6) / 2, (WinColumn - 40) / 2, 6, 40);
+    GoTo((WinRow - 2)/2, (WinColumn - 34)/2);
+    cout << "Time's up! Your total score is " << player.score;
+    GoTo((WinRow - 2)/2 + 1, (WinColumn - 34)/2);
+    cout << "Press any key to return to menu...";
+    getch();
+}
 
-
-//     return 0;
-
-// }
+void updateScore(PlayerState &player)
+{
+    player.score += 10;
+}

@@ -1,28 +1,33 @@
 #include "board.h"
 
-void make_board(GameState &game) {
+void make_board(GameState &game, int &move_count) {
     srand(time(NULL));
     char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L', 'K' , 'I'};
     int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
     
-    switch (game.difficulty)
-    {
-        case 1:
-            game.row = 4;
-            game.col = 6;
-            game.total_time = 120;
-            break;
-        case 2:
-            game.row = 6;
-            game.col = 8;
-            game.total_time = 180;
-            break;
-        case 3:
-            game.row = 8;
-            game.col = 10;
-            game.total_time = 240;
-            break;
-    }
+    if (game.stage == 1)
+        switch (game.difficulty)
+        {
+            case 1:
+                game.row = 4;
+                game.col = 6;
+                game.total_time = 120;
+                break;
+            case 2:
+                game.row = 6;
+                game.col = 8;
+                game.total_time = 180;
+                break;
+            case 3:
+                game.row = 8;
+                game.col = 10;
+                game.total_time = 240;
+                break;
+            default:
+                game.total_time = 10;
+                break;
+        }
+    move_count = (game.row * game.col) / 2;
 
     game.board = new char *[game.row];
     vector<pair<int, int>> avail_pos;
@@ -40,10 +45,10 @@ void make_board(GameState &game) {
         char c = alphabet[rand() % alphabet_size];
 
         int pos1 = rand() % avail_pos.size();
-        int pos2 = rand() % avail_pos.size();
-        while (pos1 == pos2) { // if same position is selected
+        int pos2;
+        do { 
             pos2 = rand() % avail_pos.size(); // select next position
-        }
+        } while (pos1 == pos2); // if same position is selected
 
         game.board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
         game.board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
@@ -80,6 +85,45 @@ void showBoard(GameState game, char** background, int bg_row, int bg_column, int
             if(game.board[i][j] != '\0'){
                 drawCell(s, offset_x + i*(rowSize)-i, offset_y + j*(colSize)-j, rowSize, colSize);
             }
+        }
+    }
+}
+
+void shuffle_board(GameState &game)
+{
+    char count[26] = {0};
+    vector <pair<int, int>> avail_pos;
+    for (int i = 0; i < game.row; i++)
+    {
+        for (int j = 0; j < game.col; j++)
+        {
+            if (game.board[i][j] != '\0')
+            {
+                count[game.board[i][j] - 'A'] ++;
+                avail_pos.push_back({i, j});
+            }
+        }
+    }
+
+    for (int i = 0; i < 26; i++)
+    {
+        while (count[i] > 0)
+        {
+            char c = i + 'A';
+
+            int pos1 = rand() % avail_pos.size();
+            int pos2;
+            do { 
+                pos2 = rand() % avail_pos.size(); // select next position
+            } while (pos1 == pos2); // if same position is selected
+
+            game.board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
+            game.board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
+
+            avail_pos.erase(avail_pos.begin() + max(pos1, pos2));
+            avail_pos.erase(avail_pos.begin() + min(pos1, pos2));
+
+            count[i] -= 2;
         }
     }
 }

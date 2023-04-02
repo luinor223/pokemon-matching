@@ -115,7 +115,7 @@ void displayMenu(GameState &game, int page, int choice, char** title, int title_
     } 
 }
 
-void generateMenu(GameState &game, int &page, int &choice, char** title, int title_row, int title_col)
+void generateMenu(GameState &game, int &page, int &choice, char** title, int title_row, int title_col, bool &run)
 {
     displayMenu(game, page, choice, title, title_row, title_col);
 
@@ -131,7 +131,7 @@ void generateMenu(GameState &game, int &page, int &choice, char** title, int tit
                     choice --;
                 break;
             case 'S':
-                if (choice < 3)
+                if (choice < 4)
                     choice ++;
                 break;
             case ' ':
@@ -151,8 +151,10 @@ void generateMenu(GameState &game, int &page, int &choice, char** title, int tit
                     page = 5;
                 }
                 else    //Quit
+                {
+                    run = false;
                     page = 0;
-                choice = 1;
+                }
                 break;
         }
     }
@@ -240,4 +242,9 @@ void generateMenu(GameState &game, int &page, int &choice, char** title, int tit
         if (input == 27)
             page = 1;
     }
+}
+
+void displayLeaderBoard()
+{
+
 }

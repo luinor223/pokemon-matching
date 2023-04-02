@@ -4,8 +4,7 @@ void getFileContent(string filename, char **&background, int &row, int &col)
 {
     ifstream File(filename);
     string result = "";
-
-    
+ 
     background = new char *[row];
 
     int i = 0;
@@ -20,7 +19,6 @@ void getFileContent(string filename, char **&background, int &row, int &col)
             strcpy(background[i], tempLine.c_str());
             if (maxx < tempLine.length())
                 maxx = tempLine.length();
-            //cout << background[i] << endl;
             i++;
         }
         row = i;
@@ -44,7 +42,7 @@ void printBg(char** background, int bg_row, int bg_column)
     }
 }
 
-void deleteBg(char **&background, int bg_row){
+void freeCharMatrix(char **&background, int bg_row){
     for (int i = 0; i < bg_row; i++)
         delete[] background[i];
     delete[] background;
