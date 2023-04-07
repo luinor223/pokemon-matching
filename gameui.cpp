@@ -122,11 +122,18 @@ void updateScore(GameState &game, savefile &account)
             break;
     }
     
-    if (game.score > account.record[5].points)
+    if (game.score > account.record[4].points)
     {
         GoTo(5, 90);
         cout << "New High Score!";
-        account.record[5].points = game.score;
+
+        account.record[4].points = game.score;
+        time_t now = time(0);
+        tm *ltm = localtime(&now);
+        account.record[5].date.day = ltm->tm_mday;
+        account.record[5].date.month = ltm->tm_mon + 1;
+        account.record[5].date.year = ltm->tm_year + 1900;
+
         sortRecord(account.record, 5);
     }
     

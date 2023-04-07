@@ -60,6 +60,8 @@ int main()
                     else
                         game.mode = rand() % 4 + 1;
                 }
+                cout << "WTF";
+                getch();
                 
                 board_offset_x = (bg_row - game.row * (game.cellSize - 1) - 1) / 2 + 1;
                 board_offset_y = (bg_column - game.col*(game.cellSize + 3 - 1) - 1) / 2 + 1;
@@ -85,7 +87,7 @@ int main()
                     if (checkMatching(game, background, bg_row, bg_column, board_offset_x, board_offset_y))
                     {
                         updateScore(game, account);
-                        move_count--;
+                        game.move_count--;
                         while (!moveSuggestion(game, board_offset_x, board_offset_y, false) && move_count > 0) //After matching 2 tiles, check if there is any possible match left.
                         {
                             shuffle_board(game);    //if not, shuffle the board
@@ -103,6 +105,10 @@ int main()
                     game.stage++;
                     deleteMemBoard(game);
                     initialized = false;
+
+                    clear();
+                    cout << "WTF";
+                    getch();
                     break;
                 }
 
