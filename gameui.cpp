@@ -72,39 +72,63 @@ void displayGameUI(GameState game)
     }
 }
 
-void updateUI(GameState game, PlayerState &player, int start_time)
+void updateUI(GameState game, int start_time)
 {
     GoTo(5, 82);
-    cout << player.score;
+    cout << game.score;
 
     GoTo(6, 98);
-    cout << player.help_count;
+    cout << game.help_count;
     
     GoTo(7, 98);
-    cout << player.shuffle_count;
+    cout << game.shuffle_count;
 
     time_t current_time = time(0);
-    player.time_left = (int)game.total_time - (difftime(current_time, start_time));
+    game.time_left = (int)game.total_time - (difftime(current_time, start_time));
     
-    if (player.time_left < game.total_time)
+    if (game.time_left < game.total_time)
     {
-        GoTo(37, int(player.time_left/game.total_time * (WinColumn - 20)) + 14);
+        GoTo(37, int(game.time_left/game.total_time * (WinColumn - 20)) + 14);
         for (int i = 0; i < (WinColumn - 20) / game.total_time; i++)
             cout << " ";
     }
 }
 
-void displayGameOver(PlayerState player)
+void displayGameOver(GameState game)
 {
     drawCell(" ", (WinRow - 6) / 2, (WinColumn - 40) / 2, 6, 40);
     GoTo((WinRow - 2)/2, (WinColumn - 34)/2);
-    cout << "Time's up! Your total score is " << player.score;
+    cout << "Time's up! Your total score is " << game.score;
     GoTo((WinRow - 2)/2 + 1, (WinColumn - 34)/2);
     cout << "Press any key to return to menu...";
     getch();
 }
 
-void updateScore(PlayerState &player)
+void updateScore(GameState &game, savefile &account)
 {
-    player.score += 10;
+    switch(game.difficulty)
+    {
+        case 1:
+            game.score += 10;
+            break;
+        case 2:
+            game.score += 15;
+            break;
+        case 3:
+            game.score += 20;
+            break;
+        default:
+            game.score += 10;
+            break;
+    }
+    
+    if (game.score > account.record[5].points)
+    {
+        GoTo(5, 90);
+        cout << "New High Score!";
+        account.record[5].points = game.score;
+        sortRecord(account.record, 5);
+    }
+    
 }
+

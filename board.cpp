@@ -1,6 +1,6 @@
 #include "board.h"
 
-void make_board(GameState &game, int &move_count) {
+void make_board(GameState &game) {
     srand(time(NULL));
     char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L', 'K' , 'I'};
     int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
@@ -27,7 +27,24 @@ void make_board(GameState &game, int &move_count) {
                 game.total_time = 10;
                 break;
         }
-    move_count = (game.row * game.col) / 2;
+    else
+    switch (game.difficulty)
+        {
+            case 1:
+                game.total_time = game.time_left + 60;
+                break;
+            case 2:
+                game.total_time = game.time_left + 90;
+                break;
+            case 3:
+                game.total_time = game.time_left + 120;
+                break;
+            default:
+                game.total_time = game.time_left + 60;
+                break;
+        }
+    
+    game.move_count = (game.row * game.col) / 2;
 
     game.board = new char *[game.row];
     vector<pair<int, int>> avail_pos;

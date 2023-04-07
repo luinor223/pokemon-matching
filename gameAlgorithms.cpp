@@ -296,7 +296,7 @@ bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw)
     return false;
 }
 
-void playerAction(GameState game, PlayerState &player, int  offset_x, int offset_y, int &page, char** background, char bg_row, char bg_column) 
+void playerAction(GameState game, int  offset_x, int offset_y, int &page, char** background, char bg_row, char bg_column) 
 {
     char c = getch(); // get direct input
     int x = 0, y = 0;
@@ -335,22 +335,25 @@ void playerAction(GameState game, PlayerState &player, int  offset_x, int offset
         }
         break;
     case 27: //Esc = 27
-        page = 1;
+        page = main_page;
         break;
     case 'h':
-        if (player.help_count > 0)
+        if (game.help_count > 0)
         {
-            player.help_count--;
+            game.help_count--;
             moveSuggestion(game, offset_x, offset_y, true);
         }
         break;
     case 'r':
-        if (player.shuffle_count > 0)
+        if (game.shuffle_count > 0)
         {
-            player.shuffle_count--;
+            game.shuffle_count--;
             shuffle_board(game);
             showBoard(game, background, bg_row, bg_column, offset_x, offset_y); //show the new board
         }
+        break;
+    case 'p':
+        page = save_page;
         break;
     }
     if (x != 0 || y != 0) // there is a movement input

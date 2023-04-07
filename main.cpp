@@ -5,11 +5,11 @@ int main()
 {
     SetWindowSize(WinColumn, WinRow);
     SetScreenBufferSize(WinColumn, WinRow);
-    
+    srand(time(NULL));
 
     GameState game;
-    PlayerState player;
     savefile account;
+    string file_account = "sample.bin";
 
     char** background;
     int bg_row = 32, bg_column = 66;
@@ -20,6 +20,7 @@ int main()
     int title_row = 12, title_col = 68;
     getFileContent("title.txt", title, title_row, title_col);
 
+    bool hackMode = false;
     int page = 1;
     int choice = 1;
     bool initialized = false;
@@ -30,32 +31,34 @@ int main()
     ShowConsoleCursor(false);
 
     bool run = true;
+    bool continue_game = false;
 
-    //displayLoginRegisterMenu(player);
+    displayLoginRegisterMenu(account, file_account, run);
     while (run)
     {
         // Display main menu until player chooses to start game
-        while(page <= 5 && run)
+        while((page < gameplay_page || page == save_page)  && run )
         {
-            generateMenu(game, page, choice, title, title_row, title_col, run);
+            generateMenu(account, game, file_account, page, choice, title, title_row, title_col, run, hackMode, continue_game);
         }
-        if (page == 6)
+        if (page == gameplay_page)
         {
             // If player chooses to start game, initialize game and display UI
             if (!initialized)
             {
                 clear();
                 start_time = time(0);
-                game.total_time = player.time_left + 120;
+                game.total_time = game.time_left;
 
-                make_board(game, move_count);
-
-                if (game.stage < 6)
-                    game.mode = game.stage;
-                else
+                if (!continue_game)
                 {
-                    srand(time(NULL));
-                    game.mode = rand() % 4 + 1;
+                    game.total_time = game.time_left + 60;
+                    make_board(game);
+
+                    if (game.stage < 6)
+                        game.mode = game.stage;
+                    else
+                        game.mode = rand() % 4 + 1;
                 }
                 
                 board_offset_x = (bg_row - game.row * (game.cellSize - 1) - 1) / 2 + 1;
@@ -66,21 +69,22 @@ int main()
                 {
                     shuffle_board(game);    //if not, shuffle the board
                 }
-
+                
                 displayGameUI(game);
                 showBoard(game, background, bg_row, bg_column, board_offset_x, board_offset_y);
                 
                 initialized = true;
+                continue_game = false;
             }
             while (initialized)
             {
-                updateUI(game, player, start_time);
+                updateUI(game, start_time);
                 if (kbhit())
                 {
-                    playerAction(game, player, board_offset_x, board_offset_y, page, background, bg_row, bg_column);
+                    playerAction(game, board_offset_x, board_offset_y, page, background, bg_row, bg_column);
                     if (checkMatching(game, background, bg_row, bg_column, board_offset_x, board_offset_y))
                     {
-                        updateScore(player);
+                        updateScore(game, account);
                         move_count--;
                         while (!moveSuggestion(game, board_offset_x, board_offset_y, false) && move_count > 0) //After matching 2 tiles, check if there is any possible match left.
                         {
@@ -94,7 +98,7 @@ int main()
                     drawSelectingPoint(game, 0, 0, board_offset_x, board_offset_y);
                 }
 
-                if (move_count == 0) 
+                if (game.move_count == 0) 
                 {
                     game.stage++;
                     deleteMemBoard(game);
@@ -110,9 +114,16 @@ int main()
                     break;
                 }
 
-                if (player.time_left == 0)
+                if (page == save_page)
                 {
-                    displayGameOver(player);
+                    drawCell(" ", (WinRow - 30) / 2, (WinColumn - 80) / 2, 30, 80);
+                    initialized = false;
+                    break;
+                }
+                    
+                if (game.time_left == 0)
+                {
+                    displayGameOver(game);
                     page = 1;
                     deleteMemBoard(game);
                     initialized = false;

@@ -11,11 +11,12 @@
 #include <fcntl.h>
 #include <io.h>
 #include <ctime>
+#include <windows.h>
 
 #define MAX 12
 #define PADDING 500 // bytes
 #define NAMESIZE 50
-#define PASSSIZE 50
+#define PASSSIZE 50 - 4
 #define BOARDSIZE 999
 #define URLSIZE 100
 
@@ -24,39 +25,57 @@ using namespace std;
 const int WinColumn = 120;
 const int WinRow = 40;
 
+const int Max_NumofSelectedPoint = 2;
+
 const int white = 7;
 const int black = 0;
 const int yellow = 6;
 
-struct GameState{
-    char** board = nullptr;
-    int row = 4;
-    int col = 6;
-    int difficulty = 0; //1: Easy,  2: Medium,  3: Hard
-    int cellSize = 5;
-    double total_time = 0;
-    int mode = 1;
-    int stage = 1;
-};
-
-struct PlayerState {
-    int score = 0;
-    int time_left = 10;
-    int help_count = 3;
-    int shuffle_count =3;
-};
+const int main_page = 1;
+const int diff_page = 2;
+const int custom_page = 3;
+const int load_page = 4;
+const int account_page = 5;
+const int ldboard_page = 6;
+const int credit_page = 7;
+const int gameplay_page = 8;
+const int save_page = 9;
 
 struct Point{
     int x, y;
 };
 
 Point cur{0, 0};
-int Max_NumofSelectedPoint = 2;
 vector <Point> selectedPoint;
 
+struct GameState{
+    char** board = nullptr;
+    int row = 4;
+    int col = 6;
+    Point cur {0, 0};
+    int move_count = 0;
+    int difficulty = 0; //1: Easy,  2: Medium,  3: Hard
+    int cellSize = 5;
+    double total_time = 0;
+    int mode = 1;
+    int stage = 1;
+    int score = 0;
+    int time_left = 120;
+    int help_count = 3;
+    int shuffle_count =3;
+};
+
+// struct PlayerState {
+//     int ID = 0;
+//     int score = 0;
+//     int time_left = 10;
+//     int help_count = 3;
+//     int shuffle_count = 3;
+// };
+
 struct State{ //Representing a board state
-    int row, col; // Size of the board game
-    int cur_x, cur_y; // Current cursor position
+    int row = 0, col = 0; // Size of the board game
+    int cur_x = 0, cur_y = 0; // Current cursor position
     char board[BOARDSIZE] = {0}; // Current board state
     char file_background[URLSIZE] = {0}; // Link to background file. This variable’s value is NULL if there is no current background
     // Extra variables
@@ -65,28 +84,39 @@ struct State{ //Representing a board state
     int difficulty = 0;
     int mode = 1;
     int stage = 1;
-    //500 - (sizeof(int)) * 5 = 480
+    int help_count = 3;
+    int shuffle_count = 3;
+    //500 - (sizeof(int)) * 7 = 472
+    char null_bytes[PADDING - sizeof(int)*7] = {0};
 };
 
 struct Date{
-    int dd, mm, yy;
+    int day = 1;
+    int month = 1; 
+    int year = 2023;
 };
 
 
 struct Record{
-    Date date; // Date of completed record
-    int points; // points achieved
+    Date date; // Date of completed record (12 bytes)
+    int points = 0; // points achieved (4 bytes)
     // 500 byte NULL
+    char null_bytes[500] = {0};
 };
 
 
 struct savefile{
-    char mask; // You are required to transfer all char-type variables by performing xor each with the mask-variable, bit-by-bit.
-    char name[20]; // username
-    char password[20]; // password
-    // 500 byte NULL
-    int recEasy[5] = {0, 0, 0, 0, 0}; // List of sorted best records
-    int recMedium[5] = {0, 0, 0, 0, 0};
-    int recHard[5] = {0, 0, 0, 0, 0};
-    State state; // List of save state
-};
+    char mask = 'Q'; // You are required to transfer all char-type variables by performing xor each withthe mask-variable, bit-by-bit.
+    char name[NAMESIZE] = {0}; // username
+    char password[PASSSIZE] = {0}; // password
+
+    //Extra variables
+    int position = 0;
+
+    // 500 - 4 byte NULL
+    //char null_bytes[PADDING - 4] = {0};
+    ///////////////////////////
+
+    Record record[5]; // List of sorted best records
+    State state[5]; // List of save state
+}; 

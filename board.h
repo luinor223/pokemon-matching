@@ -1,5 +1,4 @@
-#include "draw.cpp"
-#include "background.cpp"
+
 
 void memAllcBoard(GameState a);
 void make_board(GameState &game);

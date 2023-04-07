@@ -1,8 +1,16 @@
 #include "account.h"
 
-void processReg(savefile &player, bool &isLogged)
+void mask(char text[], char mask)
 {
-    fstream file("account.bin", ios::binary | ios::in | ios::out); // open file in read and write mode
+    for (int i = 0; i < strlen(text); i++)
+    {
+        text[i] = text[i] ^ mask;
+    }
+}
+
+void processReg(string filename, char* name, char* password, savefile &account, bool &isLogged)
+{
+    fstream file(filename, ios::binary | ios::in | ios::out); // open file in read and write mode
 
     if (!file.is_open()) // check if file is opened successfully
     {
@@ -11,24 +19,35 @@ void processReg(savefile &player, bool &isLogged)
     }
 
     bool isExist = false;
-    savefile tempPlayer;
-    //cout << tempPlayer.name << " " << tempPlayer.password << endl;
-    while (file.read((char*)&tempPlayer, sizeof(tempPlayer))) // read data from file
+    savefile tempAccount;
+    int position = 0;
+
+    while (file.read((char*)&tempAccount, sizeof(tempAccount))) // read data from file
     {
-        if (strcmp(tempPlayer.name, player.name) == 0) // check if username already exists
+        mask(tempAccount.name, tempAccount.mask);  //Unmask name
+        if (strcmp(tempAccount.name, name) == 0) // check if username already exists
         {
             isExist = true;
             cout << "Username already exists. Press any key to go back...";
             getch();
             break;
         }
+        position++;
     }
 
     if (!isExist) // if username does not exist, write player data to file
     {
         file.clear();
         file.seekp(0, ios::end);
-        file.write((char*)&player, sizeof(player));
+
+        strcpy(account.name, name);
+        strcpy(account.password, password);
+        account.mask = 'A' + rand() % 26;
+        mask(account.name, account.mask);
+        mask(account.password, account.mask);
+        account.position = position;
+
+        file.write((char*)&account, sizeof(account));
         cout << "Registration successful! Press any key to continue...";
         getch();
         isLogged = true;
@@ -37,25 +56,30 @@ void processReg(savefile &player, bool &isLogged)
     file.close(); // close file
 }
 
-void processLogin(savefile player, bool &isLogged)
+void processLogin(string filename, char* name, char* password, savefile &account, bool &isLogged)
 {
-    ifstream file("account.bin", ios::binary);
+    ifstream file(filename, ios::binary);
     if (!file.is_open()) // check if file is opened successfully
     {
         cout << "Error! File cannot be opened.";
         return;
     }
 
-    savefile tempPlayer;
-    while (file.read((char*)&tempPlayer, sizeof(tempPlayer))) // read data from file
+    int position = 0;
+
+    while (file.read((char*)&account, sizeof(account))) // read data from file
     {
-        if (strcmp(tempPlayer.password, player.password) == 0) // check if username exists
+        mask(account.name, account.mask);  //UnMask username
+        mask(account.password, account.mask); // UnMask password
+
+        if (strcmp(account.name, name) == 0) // check if username exists
         {
-            if (strcmp(tempPlayer.password, player.password) == 0) //check if password matches
+            if (strcmp(account.password, password) == 0) //check if password matches
             {
                 cout << "Login successful! Press any key to continue...";
                 getch();
                 isLogged = true;
+                account.position = position;
                 break;
             }
             else
@@ -63,21 +87,24 @@ void processLogin(savefile player, bool &isLogged)
                 break;
             }
         }
+        position ++;
     }
 
-    if(isLogged == false)
+    if(!isLogged)
     {
-        cout << "Username or Password is not correct! Press any key to go back.";
+        cout << "Username or Password is not correct! Press any key to go back...";
         getch();
     }
     
     file.close();  
 }
 
-void displayForm(savefile player,int choice, bool &isLogged)
+void displayForm(string filename, savefile &account, int choice, bool &isLogged)
 {
     clear();
     string title = "";
+    char temp_name[NAMESIZE];
+    char temp_password[PASSSIZE];
     if (choice == 1)
         title = "LOG IN";
     else
@@ -96,20 +123,20 @@ void displayForm(savefile player,int choice, bool &isLogged)
     drawCell(" ", 6, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
 
     GoTo(4, (WinColumn - 10 - box_size) / 2 + 12);
-    cin.getline(player.name, 20);
+    cin.getline(temp_name, 20);
 
     GoTo(7, (WinColumn - 10 - box_size) / 2 + 12);
-    cin.getline(player.password, 20);
+    cin.getline(temp_password, 20);
 
     GoTo(9, (WinColumn - 50 - box_size) / 2 + 12);
 
     if (choice == 1)
-        processLogin(player, isLogged);
+        processLogin(filename, temp_name, temp_password, account, isLogged);
     else
-        processReg(player, isLogged);
+        processReg(filename, temp_name, temp_password, account, isLogged);
 }
 
-void displayLoginRegisterMenu(savefile &player)
+void displayLoginRegisterMenu(savefile &account, string filename, bool &run)
 {
     string title = "POKEMON PUZZLE!";
     string username;
@@ -163,11 +190,11 @@ void displayLoginRegisterMenu(savefile &player)
                 case ' ':
                     if (choice == 1 || choice == 2)
                     {
-                        displayForm(player, choice, isLogged);
+                        displayForm(filename, account, choice, isLogged);
                     }
                     else
                     {
-                        //HOW QUIT CONSOLE?
+                        run = false;
                     }
                     break;
             }
@@ -175,22 +202,68 @@ void displayLoginRegisterMenu(savefile &player)
     }
 }
 
-void saveGame(savefile player, char** board);
+void loadBoard(GameState &game, savefile account, int index) 
+{
+    game.row = account.state[index].row;
+    game.col = account.state[index].col;
+    game.cur.x = account.state[index].cur_x;
+    game.cur.y = account.state[index].cur_y;
+    game.move_count = 0;
 
+    game.board = new char *[game.row];
+    for (int i = 0; i < game.row; i++)
+    {
+        game.board[i] = new char[game.col];
+        for (int j = 0; j < game.col; j++)
+        {
+            game.board[i][j] = account.state[index].board[i*game.col + j] ^ account.mask;  //unmask
+            if (game.board[i][j] != '\0')
+                game.move_count++;
+        }
+    }
+    game.move_count /= 2;
 
-// int main()
-// {
-//     SetWindowSize(120, 30);
-//     // clear();
-//     // int page = 1, choice = 1;
-//     // while (page <= 4 && choice <= 4)
-//     // {
-//     //     generateMenu(page, choice);
-//     //     if (page == 0)
-//     //         break;
-//     // }
-//     savefile player;
-//     displayLoginRegisterMenu(player);
+    game.time_left = (account.state[index].time_left > 0) ? account.state[index].time_left : 120;
+    game.score = account.state[index].score;
+    game.difficulty = account.state[index].difficulty;
+    game.mode = (account.state[index].mode > 0) ? account.state[index].mode : 1;
+    game.stage = (account.state[index].stage > 0) ? account.state[index].stage : 1;
+}
 
-//     return 0;
-// }
+void saveBoard(GameState game, savefile &account, int index)
+{
+    account.state[index].row = game.row;
+    account.state[index].col = game.col;
+    account.state[index].cur_x = game.cur.x;
+    account.state[index].cur_y = game.cur.y;
+
+    for (int i = 0; i < game.row; i++)
+        for (int j = 0; j < game.col; j++)
+            account.state[index].board[i*game.col + j] = game.board[i][j] ^ account.mask; //mask
+
+    account.state[index].time_left = game.time_left;
+    account.state[index].score = game.score;
+    account.state[index].difficulty = game.difficulty;
+    account.state[index].mode = game.mode;
+    account.state[index].stage = game.stage;
+    account.state[index].help_count = game.help_count;
+    account.state[index].shuffle_count = game.shuffle_count;
+}
+
+void saveGame(string filename, savefile account)
+{
+    fstream file(filename, ios::binary | ios::out); // open file in read and write mode
+    if (!file.is_open()) // check if file is opened successfully
+    {
+        cout << "Error! " << filename << " is missing!";
+        getch();
+        return;
+    }
+    file.seekp(account.position*sizeof(account), ios::beg);
+
+    mask(account.name, account.mask);
+    mask(account.password, account.mask);
+    file.write((char*)&account, sizeof(account));
+
+    file.close();
+}

@@ -1,5 +1,7 @@
+#include "console.cpp"
+#include "draw.cpp"
+#include "background.cpp"
 #include "board.cpp"
-//#include "console.cpp"
 #include "account.cpp"
 #include "menu.cpp"
 #include "gameui.cpp"
