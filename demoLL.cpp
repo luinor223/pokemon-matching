@@ -362,15 +362,47 @@ void drawPoint(List* board, PointLL point)
 vector<pair<int, int>> findPathLL(List* board, int row, int col, PointLL cur, PointLL selected, int mode)
 {
 	//INIT Graph
-    // need 4 mode, again...
-	vector<vector<int>> e(row + 2, vector<int>(col + 2, 0));
-	for (int i = 0; i < row; ++i)
-	{
-		for (int j = 0; j < col; ++j)
-		{
-			e[i + 1][j + 1] = getAt(board[i], j) != '\0';
-		}
-	}
+    vector<vector<int>> e(row + 2, vector<int>(col + 2, 0));
+    if (mode == 1)
+    {  
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < col; ++j)
+            {
+                e[i + 1][j + 1] = getAt(board[i], j) != '\0';
+            }
+        }
+    }
+    else if (mode == 2)
+    {
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < col; ++j)
+            {
+                e[i + 1][j + 1] = getAt(board[j], j) != '\0';
+            }
+        }
+    }
+    else if (mode == 3)
+    {
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < col; ++j)
+            {
+                e[i + 1][j + 1] = getAt(board[i], (col-1)-j) != '\0';
+            }
+        }
+    }
+    else if (mode == 4)
+    {
+        for (int i = 0; i < row; ++i)
+        {
+            for (int j = 0; j < col; ++j)
+            {
+                e[i + 1][j + 1] = getAt(board[j], (row-1)-i) != '\0';
+            }
+        }
+    }
     ////////////////////////////////////////////////////////////
 	pair<int, int> s = { cur.x + 1, cur.y + 1 };
 	pair<int, int> t = { selected.x + 1, selected.y + 1 }; 
@@ -413,7 +445,7 @@ vector<pair<int, int>> findPathLL(List* board, int row, int col, PointLL cur, Po
 	return res;
 }
 
-void checkMatchingLL(List* board, int row, int col, PointLL cur, PointLL selected, int mode)
+void checkMatchingLL(List* board, int row, int col, PointLL &cur, PointLL &selected, int mode)
 {
     if ((selected.x == -1 && selected.y == -1) || (selected.x == cur.x && selected.y == cur.y))
         return;
@@ -424,8 +456,23 @@ void checkMatchingLL(List* board, int row, int col, PointLL cur, PointLL selecte
     if (res.size() >= 2 && res.size() <= 4)
     {
         // careful here if delete at the same row or col
-        deleteNodeAt(board[cur.LL_x], cur.LL_y);
-        deleteNodeAt(board[selected.LL_x], selected.LL_y);
+        if (cur.LL_x == selected.LL_x)
+        {
+            deleteNodeAt(board[cur.LL_x], max(cur.LL_y, selected.LL_y));
+            deleteNodeAt(board[selected.LL_x], min(cur.LL_y, selected.LL_y));
+        }
+        else if (cur.LL_y == selected.LL_y)
+        {
+            deleteNodeAt(board[max(cur.LL_x, selected.LL_x)], cur.LL_y);
+            deleteNodeAt(board[min(cur.LL_x, selected.LL_x)], selected.LL_y);
+        }
+        else
+        {
+            deleteNodeAt(board[cur.LL_x], cur.LL_y);
+            deleteNodeAt(board[selected.LL_x],  selected.LL_y);
+        }
+        selected.x = -1;
+        selected.y = -1;
     }
 
 }
@@ -471,13 +518,13 @@ void playerInput(List* board, PointLL &cur, PointLL &selected, int row, int col,
 
 int main()
 {
-    int row = 6, col = 4, gamemode = 1;
-    char arr[MAX_SIZE][MAX_SIZE] = {{'a', 'b', 'c', 'a'},
+    int row = 6, col = 4, gamemode = 4;
+    char arr[MAX_SIZE][MAX_SIZE] = {{'x', 'b', 'c', 'a'},
                                     {'a', 'b', 'c', 'm'},
                                     {'a', 'x', 'h', 'd'},
+                                    {'a', 'b', 'b', 'd'},
                                     {'a', 'b', 'c', 'd'},
-                                    {'a', 'b', 'c', 'd'},
-                                    {'H', 'H', 'G', 'G'}};
+                                    {'H', 'h', 'G', 'G'}};
                      
     List* board;
     PointLL cur = {0, 0, 0, 0};
@@ -493,13 +540,9 @@ int main()
         drawPoint(board, cur);
         drawPoint(board, selected);
         
-        // vector<pair<int, int>> res = findPathLL(board, row, col, 1, 1, 2, 2);
-        // if (res.size() <= 4 && res.size() >= 2)
-        //     deleteNodeAt(board[boardX], boardY);
-        
         playerInput(board, cur, selected, row, col, gamemode);
         
-        
+            
     }
     
     return 0;
