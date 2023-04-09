@@ -16,30 +16,47 @@
 #define MAX 12
 #define PADDING 500 // bytes
 #define NAMESIZE 50
-#define PASSSIZE 50 - 4
+#define PASSSIZE 50
 #define BOARDSIZE 999
 #define URLSIZE 100
 
 using namespace std;
 
-const int WinColumn = 120;
-const int WinRow = 40;
+const int WinColumn = 130;
+const int WinRow = 45;
+
+const int gameboxrow = WinRow - 5;
+const int gameboxcol = WinColumn - 47;
+const int infoboxrow = gameboxrow;
+const int infoboxcol = 47;
+const int timeboxrow = 5;
+const int timeboxcol = WinColumn;
 
 const int Max_NumofSelectedPoint = 2;
 
-const int white = 7;
 const int black = 0;
+const int white = 15;
 const int yellow = 6;
+const int grey = 8;
+
+const string Cheat_page = "H4CK";
+const string Cheat_shuffle = "s4uffle";
+const string Cheat_help = "call911";
+const string Cheat_score = "easygame";
+const string Cheat_time = "bounstime";
+
+const int bouns_time = 60;
 
 const int main_page = 1;
 const int diff_page = 2;
 const int custom_page = 3;
 const int load_page = 4;
 const int account_page = 5;
-const int ldboard_page = 6;
-const int credit_page = 7;
-const int gameplay_page = 8;
-const int save_page = 9;
+const int hack_page = 6;
+const int ldboard_page = 7;
+const int credit_page = 8;
+const int gameplay_page = 9;
+const int save_page = 10;
 
 struct Point{
     int x, y;
@@ -64,14 +81,6 @@ struct GameState{
     int help_count = 3;
     int shuffle_count =3;
 };
-
-// struct PlayerState {
-//     int ID = 0;
-//     int score = 0;
-//     int time_left = 10;
-//     int help_count = 3;
-//     int shuffle_count = 3;
-// };
 
 struct State{ //Representing a board state
     int row = 0, col = 0; // Size of the board game
@@ -114,9 +123,43 @@ struct savefile{
     int position = 0;
 
     // 500 - 4 byte NULL
-    //char null_bytes[PADDING - 4] = {0};
+    char null_bytes[PADDING - 4] = {0};
     ///////////////////////////
 
     Record record[5]; // List of sorted best records
     State state[5]; // List of save state
+
+    int getElo(){
+        int avg = 0, count = 0;
+        for (int i = 0; i < 5; i++)
+            if(record[i].points > 0)
+            {
+                avg += record[i].points;
+                count++;
+            }
+        if (count > 0)
+            avg/=count;
+
+        return avg;
+    }
 }; 
+
+struct PlayerInfo {
+    string name = "";
+    int elo = 0;
+    string rank = "";
+
+    string getRank(){
+        if (elo <= 1600)
+            return "Bronze";
+        else if (elo <= 3200)
+            return "Silver";
+        else if (elo <= 4800)
+            return "Gold";
+        else if (elo <= 6000)
+            return "Platinum";
+        else if (elo <= 7600)
+            return "Master";
+        return "Challenger";
+    }
+};

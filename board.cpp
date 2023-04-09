@@ -107,6 +107,8 @@ void showBoard(GameState game, char** background, int bg_row, int bg_column, int
 
 void shuffle_board(GameState &game)
 {
+    cout << "reaaa";
+    getch();
     char count[26] = {0};
     vector <pair<int, int>> avail_pos;
     for (int i = 0; i < game.row; i++)
@@ -120,6 +122,8 @@ void shuffle_board(GameState &game)
             }
         }
     }
+    cout << "resss";
+    getch();
 
     for (int i = 0; i < 26; i++)
     {
@@ -142,4 +146,6 @@ void shuffle_board(GameState &game)
             count[i] -= 2;
         }
     }
+    cout << "resetted";
+    getch();
 }

@@ -5,13 +5,14 @@ Page 2 = Difficulty choice
 Page 3 = Custom board page
 Page 4 = Load Game
 Page 5 = Account
-Page 6 = Show leaderboard
-Page 7 = Show game credit
-Page 8 = Gameplay
-Page 9 = Save game
+Page 6 = Hack
+Page 7 = Show leaderboard
+Page 8 = Show game credit
+Page 9 = Gameplay
+Page 10 = Save game
 */
 
-void generateMenu(savefile &account, GameState &game, string filename, int &page, int &choice, char** title, int title_row, int title_col, bool &run, bool &hackMode, bool &continue_game)
+void generateMenu(savefile &account, GameState &game, PlayerInfo players[], string filename, int &page, int &choice, char** title, int title_row, int title_col, bool &run, bool &continue_game, int &word_count)
 {
     char input; 
 
@@ -103,6 +104,7 @@ void generateMenu(savefile &account, GameState &game, string filename, int &page
                 }
                 break;
             case 27:
+                clear();
                 page = 1;
                 break;
         }
@@ -146,6 +148,7 @@ void generateMenu(savefile &account, GameState &game, string filename, int &page
                 }
                 break;
             case 27:
+                clear();
                 page = 1;
                 break;
         }
@@ -174,80 +177,90 @@ void generateMenu(savefile &account, GameState &game, string filename, int &page
                 }
                 break;
             case 27:
+                clear();
                 page = 1;
                 break;
         }
     }
     else if (page == account_page)
     {
-        displayAccountInfo(account, choice, hackMode);
+        displayAccountInfo(account, choice, page);
         input = getch();
         input = toupper(input);
-        if (!hackMode)
-            switch(input)
-            {
-                case 'A':
-                    if (choice > 1)
-                        choice --;
-                    break;
-                case 'D':
-                    if (choice < 4)
-                        choice ++;
-                    break;
-                case ' ':
-                    if (choice == 1) //Change username
-                    {
-                        bool changed = false;
-                        changeNameForm(account, filename, changed);
-                        if (changed)
-                            saveGame(filename, account);
-                    }
-                    else if (choice == 2) //Change Password
-                    {   
-                        bool changed = false;
-                        changePasswordForm(account, changed);
-                        if (changed)
-                            saveGame(filename, account);
-                    }
-                    else if (choice == 3) //Hack Mode: ON
-                    {
-                        hackMode = true;
-                    }
-                    else    //Return to main menu
-                        page = 1;
-                    break;
-            }
-        else
+        if (checkCheatCode(input, word_count, Cheat_page))
         {
-            input = getch();
-            input = toupper(input);
-            switch(input)
-            {
-                case 'W':
-                    if (choice > 1)
-                        choice --;
-                    break;
-                case 'S':
-                    if (choice < 4)
-                        choice ++;
-                    break;
-                case 'A':
-                    if (choice != 6 && account.record[choice - 1].points >= 10)
-                        account.record[choice - 1].points -=10;
-                    break;
-                case 'D':
-                    if (choice != 6 && account.record[choice - 1].points < INT_MAX)
-                        account.record[choice - 1].points +=10;
-                    break;
-                case ' ':
-                    if (choice == 6) //Save
-                    {
-                        sortRecord(account.record, 5);
+            clear();
+            page = hack_page;
+        }
+        switch(input)
+        {
+            case 'A':
+                if (choice > 1)
+                    choice --;
+                break;
+            case 'D':
+                if (choice < 4)
+                    choice ++;
+                break;
+            case ' ':
+                if (choice == 1) //Change username
+                {
+                    bool changed = false;
+                    changeNameForm(account, filename, changed);
+                    if (changed)
                         saveGame(filename, account);
-                        hackMode = false;
-                    }
-                    break;
-            }
+                }
+                else if (choice == 2) //Change Password
+                {   
+                    bool changed = false;
+                    changePasswordForm(account, changed);
+                    if (changed)
+                        saveGame(filename, account);
+                }
+                else if (choice == 3)
+                {
+                    page = hack_page;
+                    clear();
+                }
+                else    //Return to main menu
+                {
+                    page = 1;
+                    clear();
+                }
+                break;
+        }
+    }
+    else if (page == hack_page)
+    {
+        processHacking(account, choice);
+        input = getch();
+        input = toupper(input);
+        switch(input)
+        {
+            case 'W':
+                if (choice > 1)
+                    choice --;
+                break;
+            case 'S':
+                if (choice < 6)
+                    choice ++;
+                break;
+            case 'A':
+                if (choice != 6 && account.record[choice - 1].points >= 10)
+                    account.record[choice - 1].points -=10;
+                break;
+            case 'D':
+                if (choice != 6 && account.record[choice - 1].points < INT_MAX)
+                    account.record[choice - 1].points +=10;
+                break;
+            case ' ':
+                if (choice == 6) //Save
+                {
+                    sortRecord(account.record, 5);
+                    saveGame(filename, account);
+                    page = account_page;
+                }
+                break;
         }
     }
     else if (page == save_page)
@@ -272,31 +285,22 @@ void generateMenu(savefile &account, GameState &game, string filename, int &page
                 continue_game = true;
                 break;
             case 27:
-                page = 1;  
+                page = gameplay_page;
+                continue_game = true;
                 break;
         }
     }
-    else 
-        page = 1;
-}
-
-void displayGameTitle(char** title, int title_row, int title_col)
-{
-    for (int i = 0; i < title_row; i++)
+    else if (page == ldboard_page)
     {
-        GoTo(i, (WinColumn - 67) / 2);
-        for (int j = 0; j < title_col; j++)
+        displayLdBoard(players);
+        input = getch();
+        if (input == 27)
         {
-            if (title[i][j] == '#')
-                SetColor(0, 6);
-            else
-                SetColor(0, 1);
-            cout << title[i][j];
+            clear();
+            page = main_page;
         }
     }
-    SetColor();
 }
-
 void displayMainMenu(int choice)
 {
     vector<string> options;
@@ -317,12 +321,12 @@ void displayMainMenu(int choice)
     {
         if (choice == i + 1)
         {
-            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
+            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, yellow, white);
             posX += cellRowSize;
         }
         else
         {
-            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, white, black);
+            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, black, white);
             posX += cellRowSize;
         }
         
@@ -346,12 +350,12 @@ void displayDifficultyChoice(int choice)
     {
         if (choice - 1 == i)
         {
-            drawCell(difficulty[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
+            drawCell(difficulty[i], posX, posY, cellRowSize, cellColumnSize, yellow, white);
             posX += cellRowSize;
         }
         else
         {
-            drawCell(difficulty[i], posX, posY, cellRowSize, cellColumnSize, white, black);
+            drawCell(difficulty[i], posX, posY, cellRowSize, cellColumnSize, black, white);
             posX += cellRowSize;
         }
         
@@ -401,13 +405,13 @@ void displayLoadGamePage(savefile account, int choice)
         }
         
         if (choice == i + 1)
-            drawCell(saved_inf, 7 + (cellRowSize+1)*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, yellow, black);
+            drawCell(saved_inf, 7 + (cellRowSize+1)*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, yellow, white);
         else
-            drawCell(saved_inf, 7 + (cellRowSize+1)*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, white, black);
+            drawCell(saved_inf, 7 + (cellRowSize+1)*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, black, white);
     }
 }
 
-void displayAccountInfo(savefile account, int choice, bool hackMode)
+void displayAccountInfo(savefile account, int choice, int page)
 {
     drawCell("Account Info", 5, 10, 3, 33);
     drawCell(" ", 8, 10, 15, 33);
@@ -460,25 +464,19 @@ void displayAccountInfo(savefile account, int choice, bool hackMode)
     else if (avg <= 9200)
         cout << "Challenger";
 
-    if (!hackMode)
+    vector<string> options;
+    options.push_back("Change Username");
+    options.push_back("Change password");
+    options.push_back("Don't choose here"); 
+    options.push_back("Return");
+    for (int i = 0; i < options.size(); i++)
     {
-        vector<string> options;
-        options.push_back("Change Username");
-        options.push_back("Change password");
-        options.push_back("Don't choose here"); 
-        options.push_back("Return");
-        for (int i = 0; i < options.size(); i++)
-        {
-            if (choice == i + 1)
-                drawCell(options[i], 25 ,(WinColumn - options.size()*22)/2 + i*22 + 1, 3, 22, yellow, black);
-            else
-                drawCell(options[i], 25 ,(WinColumn - options.size()*22)/2 + i*22 + 1, 3, 22, white, black);
-        }
+        if (choice == i + 1)
+            drawCell(options[i], 25 ,(WinColumn - options.size()*22)/2 + i*22 + 1, 3, 22, yellow, white);
+        else
+            drawCell(options[i], 25 ,(WinColumn - options.size()*22)/2 + i*22 + 1, 3, 22, black, white);
     }
-    else
-    {
-        processHacking(account, choice);
-    }
+
 }
 
 void changeNameForm(savefile &account, string filename, bool &changed)
@@ -586,20 +584,81 @@ void changePasswordForm(savefile &account, bool &changed)
 
 void processHacking(savefile account, int choice)
 {
+    drawCell("Account Info", 5, 10, 3, 33);
+    drawCell(" ", 8, 10, 15, 33);
+    GoTo(9, 12);
+    cout << "Username: " << account.name;
+    GoTo(10, 12);
+    cout << "Password: ";
+    for (int i = 0; i < strlen(account.password); i++)
+        cout << "*";
+
+    drawCell("High Score", 5, 44, 3, 33);
+    drawCell(" ", 8, 44, 15, 33);
+    for (int i = 0; i < 5; i++)
+    {
+        GoTo(9 + 2*i, 46);
+        cout << "1. Date: " << account.record[i].date.day << "/"<< account.record[i].date.month<< "/"<< account.record[i].date.year;
+        GoTo(9 + 2*i+1, 46);
+        cout << "Score: " << account.record[i].points;
+    }
+
+    drawCell("Summary", 5, 78, 3, 38);
+    drawCell(" ", 8, 78, 15, 38);
+    int avg = 0, count = 0;
+    for (int i = 0; i < 5; i++)
+    {
+        if(account.record[i].points > 0)
+        {
+            avg += account.record[i].points;
+            count++;
+        }
+    }
+    if (count > 0)
+        avg/=count;
+
+    GoTo(10, 80);
+    cout << "Your elo is: " << avg;
+
+    GoTo(11, 80);
+    cout << "Your current rank is: ";
+    if (avg <= 1600)
+        cout << "Bronze";
+    else if (avg <= 3200)
+        cout << "Silver";
+    else if (avg <= 4800)
+        cout << "Gold";
+    else if (avg <= 6000)
+        cout << "Platinum";
+    else if (avg <= 7600)
+        cout << "Master";
+    else if (avg <= 9200)
+        cout << "Challenger";
+
     for (int i = 0; i < 5; i++)
     {
         GoTo(9 + 2*i+1, 53);
         if (choice == i+1)
-            SetColor(black, yellow);
+            SetColor(white, yellow);
         else
             SetColor();
         cout << "< " << account.record[i].points << " >";
     }
 
     if (choice == 6)
-        drawCell("Save", 25, (WinColumn - 22) / 2, 3, 22, yellow, black);
+        drawCell("Save", 25, (WinColumn - 22) / 2, 3, 22, yellow, white);
     else
-        drawCell("Save", 25, (WinColumn - 22) / 2, 3, 22, white, black);
+        drawCell("Save", 25, (WinColumn - 22) / 2, 3, 22, black, white);
+}
+
+bool checkCheatCode(char c, int &count, string cheatCode)
+{
+    if (c == cheatCode[count])
+        count++;
+    else
+        count = 0;
+    
+    return count == cheatCode.length();
 }
 
 void sortRecord(Record record[], int n) {
@@ -628,7 +687,7 @@ void displayCreditPage()
 
 void displaySavePage(GameState game, savefile account, int choice)
 {
-    GoTo(1, (WinColumn - 34)/2);
+    GoTo(4, (WinColumn - 34)/2);
     cout << "Choose the slot you want to save.";
     int cellRowSize = 5;
     for (int i = 0; i < 5; i++)
@@ -645,8 +704,83 @@ void displaySavePage(GameState game, savefile account, int choice)
         }
         
         if (choice == i + 1)
-            drawCell(saved_inf, 7 + 5*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, yellow, black);
+            drawCell(saved_inf, 7 + 5*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, yellow, white);
         else
-            drawCell(saved_inf, 7 + 5*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, white, black);
+            drawCell(saved_inf, 7 + 5*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, black, white);
+    }
+}
+
+void getLdBoard(PlayerInfo players[], string account_file)
+{
+    ifstream file(account_file, ios::binary);
+    if (!file)
+    {
+        cout << "Error, missing " << account_file << ".";
+        getch();
+        return;
+    }
+
+    savefile tempAccount;
+    int count = 0;
+    while(file.read((char*)&tempAccount, sizeof(tempAccount)))
+    {
+        if (tempAccount.getElo() > players[9].elo)
+        {
+            mask(tempAccount.name, tempAccount.mask);
+            players[count].name = tempAccount.name;
+            players[count].elo = tempAccount.getElo();
+            players[count].rank = players[count].getRank();
+            count++;
+
+            sortLB(players);
+        }
+    }
+
+    file.close();
+}
+
+void sortLB(PlayerInfo arr[]) {
+    for (int i = 1; i < 10; i++) {
+        PlayerInfo key = arr[i];
+        int j = i - 1;
+        while (j >= 0 && arr[j].elo < key.elo) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+
+void displayLdBoard(PlayerInfo players[])
+{
+    GoTo(1, (WinColumn -12)/2);
+    cout << "LeaderBoard";
+    
+    int numbersize = 5;
+    int namesize = 40;
+    int ratingsize = 20;
+    int ranksize = 20;
+
+    int totalsize = numbersize + namesize + ratingsize + ranksize;
+
+    drawCell("#", 5, (WinColumn - totalsize)/2, 3, numbersize);
+    drawCell("Name", 5, (WinColumn - totalsize)/2 + numbersize, 3, namesize);
+    drawCell("Rating", 5, (WinColumn - totalsize)/2 + numbersize + namesize, 3, ratingsize);
+    drawCell("Rank", 5, (WinColumn - totalsize)/2 + numbersize + namesize + ratingsize, 3, ranksize);
+
+    for (int i = 0; i < 10; i++)
+    {
+        GoTo(8 + 2*i, (WinColumn - totalsize)/2 + numbersize/2);
+        cout << i+1;
+
+        GoTo(8+ 2*i, (WinColumn - totalsize)/2 + numbersize + 2);
+        cout << players[i].name;
+
+        GoTo(8+ 2*i, (WinColumn - totalsize)/2 + numbersize + namesize + 5);
+        cout << players[i].elo;
+
+        GoTo(8+ 2*i, (WinColumn - totalsize)/2 + numbersize + namesize + ratingsize + 3);
+        cout << players[i].rank;
     }
 }

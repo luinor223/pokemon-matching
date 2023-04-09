@@ -23,7 +23,23 @@ void SetWindowSize(SHORT width, SHORT height)
     SetConsoleWindowInfo(hStdout, 1, &WindowSize);
 }
 
-void SetColor(int backgound_color = 0, int text_color = 7)
+void setConsoleColors() {
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD pos = { 0, 0 };
+    DWORD written;
+    CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
+
+    // Save current console buffer info
+    GetConsoleScreenBufferInfo(console, &consoleInfo);
+
+    // Fill console buffer with white background
+    FillConsoleOutputAttribute(console, BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE, consoleInfo.dwSize.X * consoleInfo.dwSize.Y, pos, &written);
+
+    // Set console cursor position to top-left corner
+    SetConsoleCursorPosition(console, pos);
+}
+
+void SetColor(int backgound_color = white, int text_color = black)
 {
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -53,9 +69,52 @@ void SetScreenBufferSize(SHORT width, SHORT height)
     SetConsoleScreenBufferSize(hStdout, NewSize);
 }
 
+void setBackgroundColor(int color)
+{
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
+    GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
+    WORD currentColor = consoleInfo.wAttributes;
+    WORD backgroundColor = color << 4;
+    SetConsoleTextAttribute(hConsole, currentColor | backgroundColor);
+}
+
+
 void clear()
 {
-	system("cls");
+	HANDLE                     hStdOut;
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    DWORD                      count;
+    DWORD                      cellCount;
+    COORD                      homeCoords = { 0, 0 };
+
+    hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
+    if (hStdOut == INVALID_HANDLE_VALUE) return;
+
+    /* Get the number of cells in the current buffer */
+    if (!GetConsoleScreenBufferInfo( hStdOut, &csbi )) return;
+    cellCount = csbi.dwSize.X *csbi.dwSize.Y;
+
+    /* Fill the entire buffer with spaces */
+    if (!FillConsoleOutputCharacter(
+        hStdOut,
+        (TCHAR) ' ',
+        cellCount,
+        homeCoords,
+        &count
+    )) return;
+
+    /* Fill the entire buffer with the current colors and attributes */
+    if (!FillConsoleOutputAttribute(
+        hStdOut,
+        csbi.wAttributes,
+        cellCount,
+        homeCoords,
+        &count
+    )) return;
+
+    /* Move the cursor home */
+    SetConsoleCursorPosition( hStdOut, homeCoords );
 }
 
 

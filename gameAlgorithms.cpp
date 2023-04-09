@@ -213,7 +213,7 @@ void drawSelectedPoint(GameState game, vector <Point> selectedPoint, int offset_
         int x = selectedPoint[i].x;
         int y = selectedPoint[i].y;
         temp = game.board[x][y];
-        drawCell(temp, offset_x + x*game.cellSize-x, offset_y + y*(game.cellSize+3)-y, game.cellSize, game.cellSize + 3, 7, 0);
+        drawCell(temp, offset_x + x*game.cellSize-x, offset_y + y*(game.cellSize+3)-y, game.cellSize, game.cellSize + 3, yellow, white);
     }
 }
 
@@ -227,7 +227,7 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
     else
         mode = 0;
     // deselecting the old cell
-    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, 0, 7, mode);
+    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, white, black, mode);
     if (isInMap(game, cur.x + x, cur.y + y)) 
     {
         cur.x += x;
@@ -251,7 +251,7 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
     else
         mode = 0;
     // selecting the new cell
-    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, 7, 0, mode); // select the new one
+    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, grey, white, mode); // select the new one
 }
 
 bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw)
@@ -292,13 +292,21 @@ bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw)
             }
         }
     }
-
     return false;
 }
 
-void playerAction(GameState game, int  offset_x, int offset_y, int &page, char** background, char bg_row, char bg_column) 
+void playerAction(GameState &game, int  offset_x, int offset_y, int &page, char** background, char bg_row, char bg_column, int cheatWordsCount[]) 
 {
     char c = getch(); // get direct input
+    if (checkCheatCode(c, cheatWordsCount[0], Cheat_shuffle))
+        game.shuffle_count += 3;
+    if (checkCheatCode(c, cheatWordsCount[1], Cheat_help))
+        game.help_count -= 3;
+    if (checkCheatCode(c, cheatWordsCount[2], Cheat_score))
+        game.score += 1000;
+    if (checkCheatCode(c, cheatWordsCount[3], Cheat_time))
+        game.total_time += bouns_time;
+
     int x = 0, y = 0;
     switch (c){ 
     case 's':
@@ -335,6 +343,11 @@ void playerAction(GameState game, int  offset_x, int offset_y, int &page, char**
         }
         break;
     case 27: //Esc = 27
+        game.score = 0;
+        game.mode = 1;
+        game.stage = 1;
+        game.help_count = 3;
+        game.shuffle_count = 3;
         page = main_page;
         break;
     case 'h':

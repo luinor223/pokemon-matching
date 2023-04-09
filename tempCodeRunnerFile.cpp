@@ -1,2 +1,8 @@
+#include "main.h"
+#include "header.h"
 
-                    clear();
+int main()
+{
+    SetWindowSize(WinColumn, WinRow);
+    SetScreenBufferSize(WinColumn, WinRow);
+    srand(time(NULL));

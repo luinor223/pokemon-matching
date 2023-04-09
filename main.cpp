@@ -6,21 +6,24 @@ int main()
     SetWindowSize(WinColumn, WinRow);
     SetScreenBufferSize(WinColumn, WinRow);
     srand(time(NULL));
+    setConsoleColors();
 
     GameState game;
     savefile account;
-    string file_account = "sample.bin";
+    PlayerInfo players[10];
+    string file_account = "save\\account.bin";
 
     char** background;
-    int bg_row = 32, bg_column = 66;
+    int bg_row = gameboxrow, bg_column = gameboxcol;
     int board_offset_x, board_offset_y;
-    getFileContent("background.txt", background, bg_row, bg_column);
+    getFileContent("asciiart\\background.txt", background, bg_row, bg_column);
 
     char** title;
-    int title_row = 12, title_col = 68;
-    getFileContent("title.txt", title, title_row, title_col);
+    int title_row = 10, title_col = 87;
+    getFileContent("asciiart\\title.txt", title, title_row, title_col);
 
-    bool hackMode = false;
+    int word_count = 0;
+    int cheatWordsCount[4] = {0};
     int page = 1;
     int choice = 1;
     bool initialized = false;
@@ -33,13 +36,14 @@ int main()
     bool run = true;
     bool continue_game = false;
 
-    displayLoginRegisterMenu(account, file_account, run);
+    displayLoginRegisterMenu(account, file_account, title, title_row, title_col, run);
+    getLdBoard(players, file_account);
     while (run)
     {
         // Display main menu until player chooses to start game
         while((page < gameplay_page || page == save_page)  && run )
         {
-            generateMenu(account, game, file_account, page, choice, title, title_row, title_col, run, hackMode, continue_game);
+            generateMenu(account, game, players, file_account, page, choice, title, title_row, title_col, run, continue_game, word_count);
         }
         if (page == gameplay_page)
         {
@@ -52,7 +56,7 @@ int main()
 
                 if (!continue_game)
                 {
-                    game.total_time = game.time_left + 60;
+                    game.total_time = game.time_left + bouns_time;
                     make_board(game);
 
                     if (game.stage < 6)
@@ -60,11 +64,9 @@ int main()
                     else
                         game.mode = rand() % 4 + 1;
                 }
-                cout << "WTF";
-                getch();
                 
-                board_offset_x = (bg_row - game.row * (game.cellSize - 1) - 1) / 2 + 1;
-                board_offset_y = (bg_column - game.col*(game.cellSize + 3 - 1) - 1) / 2 + 1;
+                board_offset_x = (gameboxrow - game.row * (game.cellSize - 1) - 1) / 2 ;
+                board_offset_y = (gameboxcol - game.col*(game.cellSize + 3 - 1) - 1) / 2;
                 board_offset_x = (board_offset_x < 1) ? 1 : board_offset_x;
                 board_offset_y = (board_offset_y < 1) ? 1 : board_offset_y;
                 while (!moveSuggestion(game, board_offset_x, board_offset_y, false))  //Check if there is any possible match on the board.
@@ -83,10 +85,10 @@ int main()
                 updateUI(game, start_time);
                 if (kbhit())
                 {
-                    playerAction(game, board_offset_x, board_offset_y, page, background, bg_row, bg_column);
+                    playerAction(game, board_offset_x, board_offset_y, page, background, bg_row, bg_column, cheatWordsCount);
                     if (checkMatching(game, background, bg_row, bg_column, board_offset_x, board_offset_y))
                     {
-                        updateScore(game, account);
+                        updateScore(game, account, players);
                         game.move_count--;
                         while (!moveSuggestion(game, board_offset_x, board_offset_y, false) && move_count > 0) //After matching 2 tiles, check if there is any possible match left.
                         {
@@ -105,10 +107,6 @@ int main()
                     game.stage++;
                     deleteMemBoard(game);
                     initialized = false;
-
-                    clear();
-                    cout << "WTF";
-                    getch();
                     break;
                 }
 
@@ -122,14 +120,14 @@ int main()
 
                 if (page == save_page)
                 {
-                    drawCell(" ", (WinRow - 30) / 2, (WinColumn - 80) / 2, 30, 80);
+                    drawCell(" ", 3, (WinColumn - 80) / 2, 30, 80);
                     initialized = false;
                     break;
                 }
                     
-                if (game.time_left == 0)
+                if (game.time_left <= 0)
                 {
-                    displayGameOver(game);
+                    GameOver(game);
                     page = 1;
                     deleteMemBoard(game);
                     initialized = false;

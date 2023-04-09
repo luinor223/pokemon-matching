@@ -15,6 +15,7 @@ void processReg(string filename, char* name, char* password, savefile &account, 
     if (!file.is_open()) // check if file is opened successfully
     {
         cout << "Error! File cannot be opened.";
+        clear();
         return;
     }
 
@@ -30,6 +31,7 @@ void processReg(string filename, char* name, char* password, savefile &account, 
             isExist = true;
             cout << "Username already exists. Press any key to go back...";
             getch();
+            clear();
             break;
         }
         position++;
@@ -51,6 +53,10 @@ void processReg(string filename, char* name, char* password, savefile &account, 
         cout << "Registration successful! Press any key to continue...";
         getch();
         isLogged = true;
+        clear();
+
+        mask(account.name, account.mask);
+        mask(account.password, account.mask);
     }
 
     file.close(); // close file
@@ -62,6 +68,7 @@ void processLogin(string filename, char* name, char* password, savefile &account
     if (!file.is_open()) // check if file is opened successfully
     {
         cout << "Error! File cannot be opened.";
+        clear();
         return;
     }
 
@@ -80,6 +87,7 @@ void processLogin(string filename, char* name, char* password, savefile &account
                 getch();
                 isLogged = true;
                 account.position = position;
+                clear();
                 break;
             }
             else
@@ -94,6 +102,7 @@ void processLogin(string filename, char* name, char* password, savefile &account
     {
         cout << "Username or Password is not correct! Press any key to go back...";
         getch();
+        clear();
     }
     
     file.close();  
@@ -101,7 +110,6 @@ void processLogin(string filename, char* name, char* password, savefile &account
 
 void displayForm(string filename, savefile &account, int choice, bool &isLogged)
 {
-    clear();
     string title = "";
     char temp_name[NAMESIZE];
     char temp_password[PASSSIZE];
@@ -111,24 +119,26 @@ void displayForm(string filename, savefile &account, int choice, bool &isLogged)
         title = "REGISTER";
     int box_size = 20;
 
-    GoTo(0, (WinColumn - title.length()) / 2);
+    int posX = 15;
+
+    GoTo(posX, (WinColumn - title.length()) / 2);
     cout << title;
     
-    GoTo(4, (WinColumn - 10 - box_size) / 2);
+    GoTo(posX + 4, (WinColumn - 10 - box_size) / 2);
     cout << "Username: ";
-    drawCell(" ", 3, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
+    drawCell(" ", posX + 3, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
 
-    GoTo(7, (WinColumn - 10 - box_size) / 2);
+    GoTo(posX + 7, (WinColumn - 10 - box_size) / 2);
     cout << "Password: ";
-    drawCell(" ", 6, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
+    drawCell(" ", posX + 6, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
 
-    GoTo(4, (WinColumn - 10 - box_size) / 2 + 12);
+    GoTo(posX + 4, (WinColumn - 10 - box_size) / 2 + 12);
     cin.getline(temp_name, 20);
 
-    GoTo(7, (WinColumn - 10 - box_size) / 2 + 12);
+    GoTo(posX + 7, (WinColumn - 10 - box_size) / 2 + 12);
     cin.getline(temp_password, 20);
 
-    GoTo(9, (WinColumn - 50 - box_size) / 2 + 12);
+    GoTo(posX + 9, (WinColumn - 50 - box_size) / 2 + 12);
 
     if (choice == 1)
         processLogin(filename, temp_name, temp_password, account, isLogged);
@@ -136,9 +146,8 @@ void displayForm(string filename, savefile &account, int choice, bool &isLogged)
         processReg(filename, temp_name, temp_password, account, isLogged);
 }
 
-void displayLoginRegisterMenu(savefile &account, string filename, bool &run)
+void displayLoginRegisterMenu(savefile &account, string filename, char** title, int title_row, int title_col, bool &run)
 {
-    string title = "POKEMON PUZZLE!";
     string username;
 
     int cellRowSize = 3;
@@ -155,49 +164,47 @@ void displayLoginRegisterMenu(savefile &account, string filename, bool &run)
     
     while (!isLogged)
     {
-        if (displayMenu)
-        {
-            clear();
-            GoTo(0, (WinColumn - title.length()) / 2);
-            cout << title;
+        displayGameTitle(title, title_row, title_col);
 
-            int posX = 2, posY = (WinColumn - cellColumnSize) / 2;
-            for (int i = 0; i < options.size(); i++)
+        int posX = 15, posY = (WinColumn - cellColumnSize) / 2;
+        for (int i = 0; i < options.size(); i++)
+        {
+            if (choice == i + 1)
             {
-                if (choice == i + 1)
+                drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
+                posX += 4;
+            }
+            else
+            {
+                drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, white, black);
+                posX += 4;
+            }
+        }
+        char input = getch();
+        input = toupper(input);
+        switch(input)
+        {
+            case 'W':
+                if (choice > 1 )
+                    choice --;
+                break;
+            case 'S':
+                if (choice < options.size())
+                    choice ++;
+                break;
+            case ' ':
+                if (choice == 1 || choice == 2)
                 {
-                    drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
-                    posX += 4;
+                    clear();
+                    displayGameTitle (title, title_row, title_col);
+                    displayForm(filename, account, choice, isLogged);
                 }
                 else
                 {
-                    drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, white, black);
-                    posX += 4;
+                    run = false;
+                    return;
                 }
-            }
-            char input = getch();
-            input = toupper(input);
-            switch(input)
-            {
-                case 'W':
-                    if (choice > 1 )
-                        choice --;
-                    break;
-                case 'S':
-                    if (choice < options.size())
-                        choice ++;
-                    break;
-                case ' ':
-                    if (choice == 1 || choice == 2)
-                    {
-                        displayForm(filename, account, choice, isLogged);
-                    }
-                    else
-                    {
-                        run = false;
-                    }
-                    break;
-            }
+                break;
         }
     }
 }
@@ -252,7 +259,7 @@ void saveBoard(GameState game, savefile &account, int index)
 
 void saveGame(string filename, savefile account)
 {
-    fstream file(filename, ios::binary | ios::out); // open file in read and write mode
+    fstream file(filename, ios::binary |ios::in | ios::out); // open file in read and write mode
     if (!file.is_open()) // check if file is opened successfully
     {
         cout << "Error! " << filename << " is missing!";

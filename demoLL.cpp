@@ -177,7 +177,41 @@ void deleteNodeAt(List& lst, int index)
     delete temp;
 }
 
-void makeLLarrayFromBoard(List* &board, char a[][MAX_SIZE], int row, int col, int mode)
+void make_boardLL(char** &board, int row, int col) {
+    char alphabet[] = {'A', 'G', 'U', 'P', 'V', 'X', 'Z', 'M', 'L', 'K' , 'I'};
+    int alphabet_size = sizeof(alphabet) / sizeof(alphabet[0]);
+
+    board = new char *[row];
+    vector<pair<int, int>> avail_pos;
+    for (int i = 0; i < row; i++)
+    {
+        board[i] = new char[col]; 
+        for (int j = 0; j < col; j++)
+        {
+            avail_pos.push_back(make_pair(i, j));
+        } 
+    }  
+
+    const int pairs = avail_pos.size() / 2;
+    for (int i = 0; i < pairs; i++) {
+        char c = alphabet[rand() % alphabet_size];
+
+        int pos1 = rand() % avail_pos.size();
+        int pos2;
+        do { 
+            pos2 = rand() % avail_pos.size(); // select next position
+        } while (pos1 == pos2); // if same position is selected
+
+        board[avail_pos[pos1].first][avail_pos[pos1].second] = c;
+        board[avail_pos[pos2].first][avail_pos[pos2].second] = c;
+
+        avail_pos.erase(avail_pos.begin() + max(pos1, pos2));
+
+        avail_pos.erase(avail_pos.begin() + min(pos1, pos2));
+    }
+}
+
+void makeLLarrayFromBoard(List* &board, char** a, int row, int col, int mode)
 {
     if (mode == 1) // left indent
     {
@@ -353,7 +387,7 @@ void drawPoint(List* board, PointLL point)
         return;
     string content;
     content = getAt(board[point.LL_x], point.LL_y);
-    drawCell(content, point.x*(5-1), point.y*(5+3-1), 5, 5+3, 7, 0, 1);
+    drawCell(content, point.x*(5-1), point.y*(5+3-1), 5, 5+3, grey, white, 1);
 }
 
 
@@ -477,7 +511,7 @@ void checkMatchingLL(List* board, int row, int col, PointLL &cur, PointLL &selec
 
 }
 
-void playerInput(List* board, PointLL &cur, PointLL &selected, int row, int col, int mode)
+void playerInput(List* board, PointLL &cur, PointLL &selected, int row, int col, int mode, bool &run)
 {
     char c = getch();
     int x = 0, y = 0;
@@ -507,6 +541,9 @@ void playerInput(List* board, PointLL &cur, PointLL &selected, int row, int col,
         else
             selected = cur;
         break;
+    case 27:
+        run = false;
+        break;
     }
     if (inMap(cur.x + x, cur.y + y, row, col))
     {
@@ -519,18 +556,20 @@ void playerInput(List* board, PointLL &cur, PointLL &selected, int row, int col,
 int main()
 {
     int row = 6, col = 4, gamemode = 4;
-    char arr[MAX_SIZE][MAX_SIZE] = {{'x', 'b', 'c', 'a'},
-                                    {'a', 'b', 'c', 'm'},
-                                    {'a', 'x', 'h', 'd'},
-                                    {'a', 'b', 'b', 'd'},
-                                    {'a', 'b', 'c', 'd'},
-                                    {'H', 'h', 'G', 'G'}};
+    char** arr;
+    make_boardLL(arr, row, col);
                      
     List* board;
     PointLL cur = {0, 0, 0, 0};
     PointLL selected = {-1, -1, -1, -1};
     makeLLarrayFromBoard(board, arr, row, col, gamemode);
-    while (true) 
+    
+    for (int i = 0; i < row; i++)
+        delete[] arr[i];
+    delete[] arr;
+
+    bool run = true;
+    while (run) 
     {
         system("cls");
         convertPos(cur, row, col, gamemode);
@@ -540,7 +579,7 @@ int main()
         drawPoint(board, cur);
         drawPoint(board, selected);
         
-        playerInput(board, cur, selected, row, col, gamemode);
+        playerInput(board, cur, selected, row, col, gamemode, run);
         
             
     }

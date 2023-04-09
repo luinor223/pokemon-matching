@@ -27,7 +27,6 @@ void getFileContent(string filename, char **&background, int &row, int &col)
     else
     {
         cout << "Error! File does not exist.";
-        
     }
 }
 
@@ -35,10 +34,9 @@ void printBg(char** background, int bg_row, int bg_column)
 {
     for(int i = 0; i < bg_row; i++)
     {
-        GoTo(i + 1, 1);
+        GoTo(i + (gameboxrow - bg_row) / 2, (gameboxcol - bg_column) / 2);
         for (int j = 0; j < bg_column; j++)
             cout << background[i][j];
-        
     }
 }
 

@@ -12,5 +12,6 @@ void SetWindowSize(SHORT width, SHORT height);
 // 6 = Yellow     14 = Light Yellow
 // 7 = White     15 = Bright White
 void SetColor(int backgound_color, int text_color);
+void setConsoleColors();
 
 void clear();

@@ -4,9 +4,6 @@ void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, in
 {
     if (mode == 0) // draw normally
     {
-        // Create a separate wcout stream object
-        //std::wostream& wcout = std::wcout;
-
         // Set the output mode to Unicode for the wcout object
         _setmode(_fileno(stdout), _O_U16TEXT);
 
@@ -31,7 +28,7 @@ void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, in
                 {
                     SetColor(bg_color, text_color);
                     wcout << " ";
-                    SetColor(0, 7); // default setting for black background, white text
+                    SetColor(); // default setting
                 }
             }
         }
@@ -49,13 +46,13 @@ void drawCell(string text, int x, int y, int cellSizeRow, int cellSizeColumn, in
                 cout << " ";
             }
         }
-        SetColor(0, 7); 
+        SetColor(); 
     }
 
     GoTo(x + cellSizeRow / 2 , y + (cellSizeColumn - text.length()) / 2);
     SetColor(bg_color, text_color);
     cout << text;
-    SetColor(0, 7);    
+    SetColor();    
 }
 
 void drawLine(int x1, int y1, int x2, int y2, int mode)
@@ -86,6 +83,19 @@ void drawLine(int x1, int y1, int x2, int y2, int mode)
             _setmode(_fileno(stdout), _O_U16TEXT);
             wcout << L"\u25A0";
             _setmode(_fileno(stdout), _O_TEXT);
+        }
+    }
+}
+
+void displayGameTitle(char** title, int title_row, int title_col)
+{
+    SetColor();
+    for (int i = 0; i < title_row; i++)
+    {
+        GoTo(i, (WinColumn - title_col) / 2);
+        for (int j = 0; j < title_col; j++)
+        {
+            cout << title[i][j];
         }
     }
 }
