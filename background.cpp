@@ -11,7 +11,7 @@ void getFileContent(string filename, char **&background, int &row, int &col)
     int maxx = 0;
     if (File.is_open())
     {
-        while(File.good() && i < row - 1)
+        while(!File.eof() && i < row - 1)
         {
             string tempLine;
             getline(File, tempLine);

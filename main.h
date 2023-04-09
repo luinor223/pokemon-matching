@@ -71,15 +71,17 @@ struct GameState{
     int col = 6;
     Point cur {0, 0};
     int move_count = 0;
-    int difficulty = 0; //1: Easy,  2: Medium,  3: Hard
+
+    int difficulty = 0; //0:Custom, 1: Easy,  2: Medium,  3: Hard
+
     int cellSize = 5;
     double total_time = 0;
-    int mode = 1;
+    int mode = 1; //1: Normal, 2: Shift left, 3: Shift right, 4: Shift up, 5: Shift down
     int stage = 1;
     int score = 0;
     int time_left = 120;
     int help_count = 3;
-    int shuffle_count =3;
+    int shuffle_count = 3;
 };
 
 struct State{ //Representing a board state

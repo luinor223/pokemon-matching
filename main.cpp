@@ -14,7 +14,7 @@ int main()
     string file_account = "save\\account.bin";
 
     char** background;
-    int bg_row = gameboxrow, bg_column = gameboxcol;
+    int bg_row = 34, bg_column = 68;
     int board_offset_x, board_offset_y;
     getFileContent("asciiart\\background.txt", background, bg_row, bg_column);
 
@@ -58,11 +58,14 @@ int main()
                 {
                     game.total_time = game.time_left + bouns_time;
                     make_board(game);
-
-                    if (game.stage < 6)
-                        game.mode = game.stage;
-                    else
-                        game.mode = rand() % 4 + 1;
+                    
+                    if (game.difficulty != 0)
+                    {
+                        if (game.stage < 6)
+                            game.mode = game.stage;
+                        else
+                            game.mode = rand() % 4 + 1;
+                    }
                 }
                 
                 board_offset_x = (gameboxrow - game.row * (game.cellSize - 1) - 1) / 2 ;
@@ -104,7 +107,13 @@ int main()
 
                 if (game.move_count == 0) 
                 {
-                    game.stage++;
+                    if (game.difficulty != 0)
+                        game.stage++;
+                    else 
+                    {
+                        clear();
+                        page = main_page;
+                    }
                     deleteMemBoard(game);
                     initialized = false;
                     break;
@@ -128,7 +137,7 @@ int main()
                 if (game.time_left <= 0)
                 {
                     GameOver(game);
-                    page = 1;
+                    page = main_page;
                     deleteMemBoard(game);
                     initialized = false;
                     break;

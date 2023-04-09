@@ -99,6 +99,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 else //Custom Mode
                 {
                     page = custom_page; //Go to custom board page
+                    clear();
                     choice = 1;
                     game.difficulty = 0;
                 }
@@ -111,6 +112,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
     }
     else if (page == custom_page) //Page 3 = Custom board
     {
+        displayGameTitle(title, title_row, title_col);
         displayCustomBoardPage(game, choice);
 
         input = getch();
@@ -122,7 +124,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                     choice--;
                 break;
             case 'S':
-                if (choice < 2)
+                if (choice < 4)
                     choice ++;
                 break;
             case 'A':
@@ -130,16 +132,24 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                     game.row -= (choice == 1);
                 if (game.col > 4)
                     game.col -= (choice == 2);
+                if (game.total_time > 10)
+                    game.total_time -= 10*(choice == 3);
+                if (game.mode > 1)
+                    game.mode -= (choice == 4);
                 break;
             case 'D':
                 if (game.row < 8)
                     game.row += (choice == 1);
                 if (game.col < 10)
                     game.col += (choice == 2);
+                if (game.total_time < 300)
+                    game.total_time += 10 * (choice  == 3);
+                if (game.mode < 5)
+                    game.mode += (choice == 4);
                 break;
             case ' ':
                 if (game.row * game.col % 2 == 0)
-                    page = 6;
+                    page = gameplay_page;
                 else
                 {
                     GoTo(5, (WinColumn - 34)/2);
@@ -365,26 +375,45 @@ void displayDifficultyChoice(int choice)
 void displayCustomBoardPage(GameState game, int choice)
 {
     string title1 = "Custom";
-    GoTo (2, (WinColumn - title1.length()) / 2);
+    GoTo (15, (WinColumn - title1.length()) / 2);
     cout << title1;
 
-    GoTo(3, (WinColumn - 34)/2);
+    GoTo(16, (WinColumn - 34)/2);
     cout << "Select the number of rows: \t\t";
+
     if (choice == 1)
-        SetColor(0, 6);
+        SetColor(white, yellow);
     cout << "< ";
     cout << game.row;
     cout << " >";
-    SetColor(0, 7);//Set Color back to default
+    SetColor();//Set Color back to default
 
-    GoTo(4, (WinColumn - 34)/2);
-    cout << "Select the number of column: \t";
+    GoTo(17, (WinColumn - 34)/2);
+    cout << "Select the number of column: \t\t";
     if (choice == 2)
-        SetColor(0, 6);
+        SetColor(white, yellow);
     cout << "< ";
     cout << game.col;
     cout << " >";
+    SetColor();
 
+    GoTo(18, (WinColumn - 34)/2);
+    cout << "Select timer: \t\t\t\t";
+    if (choice  == 3)
+        SetColor(white, yellow);
+    cout << "< ";
+    cout << game.total_time;
+    cout << " >";
+    SetColor();
+
+    GoTo(19, (WinColumn - 34)/2);
+    cout << "Select game mode: \t\t\t";
+    string gameMode[] = {"Normal", "Shift left", "Shift right", "Shift up", "Shift down"};
+    if (choice == 4)
+        SetColor(white, yellow);
+    cout << "< ";
+    cout << gameMode[game.mode - 1];
+    cout << " >";
     SetColor(); //Set Color back to default
 }
 
@@ -434,20 +463,10 @@ void displayAccountInfo(savefile account, int choice, int page)
 
     drawCell("Summary", 5, 78, 3, 38);
     drawCell(" ", 8, 78, 15, 38);
-    int avg = 0, count = 0;
-    for (int i = 0; i < 5; i++)
-    {
-        if(account.record[i].points > 0)
-        {
-            avg += account.record[i].points;
-            count++;
-        }
-    }
-    if (count > 0)
-        avg/=count;
 
+    int avg = account.getElo();
     GoTo(10, 80);
-    cout << "Your elo is: " << avg;
+    cout << "Your elo is: " << account.getElo();
 
     GoTo(11, 80);
     cout << "Your current rank is: ";

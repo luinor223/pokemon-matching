@@ -23,7 +23,8 @@ void make_board(GameState &game) {
                 game.total_time = 240;
                 break;
             default:
-                game.total_time = 10;
+                if (game.total_time < 120)
+                    game.total_time = 120;
                 break;
         }
     else
