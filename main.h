@@ -12,6 +12,7 @@
 #include <io.h>
 #include <ctime>
 #include <windows.h>
+#include <mmsystem.h>
 
 #define MAX 12
 #define PADDING 500 // bytes
