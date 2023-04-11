@@ -2,7 +2,7 @@
 #include "header.h"
 
 int main()
-{
+{ 
     SetWindowSize(WinColumn, WinRow);
     SetScreenBufferSize(WinColumn, WinRow);
     srand(time(NULL));
@@ -102,7 +102,7 @@ int main()
                     }
 
                     drawSelectedPoint(game, selectedPoint, board_offset_x, board_offset_y);
-                    drawSelectingPoint(game, 0, 0, board_offset_x, board_offset_y);
+                    drawSelectingPoint(game, 0, 0, board_offset_x, board_offset_y, background);
                 }
 
                 if (game.move_count == 0) 

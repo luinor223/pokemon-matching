@@ -217,17 +217,31 @@ void drawSelectedPoint(GameState game, vector <Point> selectedPoint, int offset_
     }
 }
 
-void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y)
+void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y, char** background)
 {
+    // deselecting the old cell
     string temp;
     int mode;
     temp = game.board[cur.x][cur.y];
     if (game.board[cur.x][cur.y] == '\0')
-        mode = 1;
-    else
-        mode = 0;
-    // deselecting the old cell
-    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, white, black, mode);
+    {
+        int startX = offset_x + cur.x*game.cellSize - cur.x;
+        int startY = offset_y + cur.y*(game.cellSize + 3) - cur.y;
+        for (int i = 1; i < game.cellSize-1; i++)
+        {
+            GoTo(startX + i, startY + 1);
+            for (int j = 1; j <  game.cellSize + 2; j++)
+            {
+                cout << background[startX + i - 3][startY + j - 7];
+            }
+        }
+    }
+    else 
+        drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, white, black, 0);
+    
+    
+    
+    // move the cursor
     if (isInMap(game, cur.x + x, cur.y + y)) 
     {
         cur.x += x;
@@ -244,13 +258,13 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
         else if (cur.y + y < 0)
             cur.y = game.col - 1;
     }
-    
+    // selecting the new cell
     temp = game.board[cur.x][cur.y];
     if (game.board[cur.x][cur.y] == '\0')
         mode = 1;
     else
         mode = 0;
-    // selecting the new cell
+    
     drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, grey, white, mode); // select the new one
 }
 
@@ -370,5 +384,5 @@ void playerAction(GameState &game, int  offset_x, int offset_y, int &page, char*
         break;
     }
     if (x != 0 || y != 0) // there is a movement input
-        drawSelectingPoint(game, x, y, offset_x, offset_y);
+        drawSelectingPoint(game, x, y, offset_x, offset_y, background);
 }
