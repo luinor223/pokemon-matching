@@ -1,10 +1,8 @@
-#include "main.h"
-#include "header.h"
-
+#include <iostream>
+#include <windows.h>
+#include <mmsystem.h>
 
 int main()
 {
-    GameState game;
-    displayGameUI(game);
-    getch();
+    PlaySound(TEXT("recycle.wav"), NULL, SND_FILENAME);
 }

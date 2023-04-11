@@ -268,6 +268,16 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 {
                     sortRecord(account.record, 5);
                     saveGame(filename, account);
+                    if (account.getElo() > players[9].elo)
+                    {
+                        if (checkNameOnLB(account, players))
+                            sortLB;
+                        else
+                        {
+                            players[9].elo = account.getElo();
+                            sortLB;
+                        }
+                    }
                     page = account_page;
                 }
                 break;
@@ -802,4 +812,13 @@ void displayLdBoard(PlayerInfo players[])
         GoTo(8+ 2*i, (WinColumn - totalsize)/2 + numbersize + namesize + ratingsize + 3);
         cout << players[i].rank;
     }
+}
+
+bool checkNameOnLB(savefile account, PlayerInfo players[])
+{
+    for (int i = 0; i < 10; i++)
+        if (players[i].name == account.name)
+            return true;
+
+    return false;
 }

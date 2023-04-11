@@ -19,3 +19,4 @@ void displaySavePage(GameState game, savefile account, int choice);
 void getLdBoard(PlayerInfo players[], string account_file);
 void sortLB(PlayerInfo arr[]);
 void displayLdBoard(PlayerInfo players[]);
+bool checkNameOnLB(savefile account, PlayerInfo players[]);

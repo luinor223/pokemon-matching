@@ -153,12 +153,5 @@ void updateScore(GameState &game, savefile &account, PlayerInfo players[])
     }
 }
 
-bool checkNameOnLB(savefile account, PlayerInfo players[])
-{
-    for (int i = 0; i < 10; i++)
-        if (players[i].name == account.name)
-            return true;
 
-    return false;
-}
 

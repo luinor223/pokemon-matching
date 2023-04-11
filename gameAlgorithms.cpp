@@ -315,7 +315,7 @@ void playerAction(GameState &game, int  offset_x, int offset_y, int &page, char*
     if (checkCheatCode(c, cheatWordsCount[0], Cheat_shuffle))
         game.shuffle_count += 3;
     if (checkCheatCode(c, cheatWordsCount[1], Cheat_help))
-        game.help_count -= 3;
+        game.help_count += 3;
     if (checkCheatCode(c, cheatWordsCount[2], Cheat_score))
         game.score += 1000;
     if (checkCheatCode(c, cheatWordsCount[3], Cheat_time))

@@ -27,7 +27,6 @@ int main()
     int page = 1;
     int choice = 1;
     bool initialized = false;
-    int move_count;
 
     bool title_display = false;
     time_t start_time;
@@ -93,7 +92,7 @@ int main()
                     {
                         updateScore(game, account, players);
                         game.move_count--;
-                        while (!moveSuggestion(game, board_offset_x, board_offset_y, false) && move_count > 0) //After matching 2 tiles, check if there is any possible match left.
+                        while (!moveSuggestion(game, board_offset_x, board_offset_y, false) && game.move_count > 0) //After matching 2 tiles, check if there is any possible match left.
                         {
                             shuffle_board(game);    //if not, shuffle the board
                         }
