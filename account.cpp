@@ -271,18 +271,31 @@ void getLdBoard(PlayerInfo players[], string account_file)
     savefile tempAccount;
     while(file.read((char*)&tempAccount, sizeof(tempAccount)))
     {
-        if (tempAccount.getElo() > players[MAXPLAYERS - 1].elo || players[MAXPLAYERS - 1].elo == 0)
+        updateLdBoard(players, tempAccount);
+    }
+
+    file.close();
+}
+
+void updateLdBoard(PlayerInfo players[], savefile account)
+{
+    if (account.getElo() > players[MAXPLAYERS - 1].elo)
+    {
+        int i =  checkNameOnLB(account, players);
+        if (i != -1)
         {
-            mask(tempAccount.name, tempAccount.mask);
-            players[MAXPLAYERS - 1].name = tempAccount.name;
-            players[MAXPLAYERS - 1].elo = tempAccount.getElo();
+            players[i].elo = account.getElo();
+            sortLB(players);
+        }
+        else
+        {
+            players[MAXPLAYERS - 1].name = account.name;
+            players[MAXPLAYERS - 1].elo = account.getElo();
             players[MAXPLAYERS - 1].rank = players[MAXPLAYERS - 1].getRank();
 
             sortLB(players);
         }
     }
-
-    file.close();
 }
 
 void sortLB(PlayerInfo arr[]) {

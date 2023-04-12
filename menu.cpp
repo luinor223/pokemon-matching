@@ -278,16 +278,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 {
                     sortRecord(account.record, 5);
                     saveGame(filename, account);
-                    if (account.getElo() > players[MAXPLAYERS - 1].elo || players[MAXPLAYERS - 1].elo == 0)
-                    {
-                        if (checkNameOnLB(account, players))
-                            sortLB(players);
-                        else
-                        {
-                            players[MAXPLAYERS - 1].elo = account.getElo();
-                            sortLB(players);
-                        }
-                    }
+                    updateLdBoard(players, account);
                     page = account_page;
                     clear();
                     displayAccountInfo(account);
@@ -738,11 +729,11 @@ void displayLdBoard(PlayerInfo players[])
     }
 }
 
-bool checkNameOnLB(savefile account, PlayerInfo players[])
+int checkNameOnLB(savefile account, PlayerInfo players[])
 {
     for (int i = 0; i < MAXPLAYERS; i++)
         if (players[i].name == account.name)
-            return true;
+            return i;
 
-    return false;
+    return -1;
 }

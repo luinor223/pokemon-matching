@@ -17,4 +17,4 @@ void displayCreditPage();
 void sortRecord(Record record[], int n);
 void displaySavePage(GameState game, savefile account, int choice);
 void displayLdBoard(PlayerInfo players[]);
-bool checkNameOnLB(savefile account, PlayerInfo players[]);
+int checkNameOnLB(savefile account, PlayerInfo players[]);
