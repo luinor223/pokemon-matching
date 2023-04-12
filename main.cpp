@@ -6,17 +6,18 @@ int main()
     SetWindowSize(WinColumn, WinRow);
     SetScreenBufferSize(WinColumn, WinRow);
     srand(time(NULL));
-    setConsoleColors();
+    SetColor();
+    clear();
 
     GameState game;
     savefile account;
-    PlayerInfo players[10];
+    PlayerInfo players[MAXPLAYERS];
     string file_account = "save\\account.bin";
 
     char** background;
-    int bg_row = 34, bg_column = 68;
+    int bg_row = 40, bg_column = 70;
     int board_offset_x, board_offset_y;
-    getFileContent("asciiart\\background.txt", background, bg_row, bg_column);
+    string bg_file = "";
 
     char** title;
     int title_row = 10, title_col = 87;
@@ -33,16 +34,19 @@ int main()
     ShowConsoleCursor(false);
 
     bool run = true;
+    bool isLogged = false;
     bool continue_game = false;
 
-    displayLoginRegisterMenu(account, file_account, title, title_row, title_col, run);
-    getLdBoard(players, file_account);
     while (run)
     {
-        // Display main menu until player chooses to start game
-        while((page < gameplay_page || page == save_page)  && run )
+        while (!isLogged && run)
         {
-            generateMenu(account, game, players, file_account, page, choice, title, title_row, title_col, run, continue_game, word_count);
+            displayLoginRegisterMenu(account, file_account, players, title, title_row, title_col, run, isLogged, page);
+        }
+        // Display main menu until player chooses to start game
+        while(isLogged && run && (page < gameplay_page || page == save_page))
+        {
+            generateMenu(account, game, players, file_account, page, choice, title, title_row, title_col, run, continue_game, word_count, isLogged, bg_file);
         }
         if (page == gameplay_page)
         {
@@ -55,20 +59,32 @@ int main()
 
                 if (!continue_game)
                 {
-                    game.total_time = game.time_left + bouns_time;
                     make_board(game);
-                    
-                    if (game.difficulty != 0)
+                }
+                if (bg_file.length() <= 1)
+                {
+                    switch(game.difficulty)
                     {
-                        if (game.stage < 6)
-                            game.mode = game.stage;
-                        else
-                            game.mode = rand() % 4 + 1;
+                        case 1:
+                            bg_file = "asciiart\\background1.txt";
+                            break;
+                        case 2:
+                            bg_file = "asciiart\\background2.txt";
+                            break;
+                        case 3:
+                            bg_file = "asciiart\\background3.txt";
+                            break;
+                        default:
+                            bg_file = "asciiart\\background4.txt";
+                            break;
                     }
                 }
-                
+
+                getFileContent(bg_file, background, bg_row, bg_column);
+                bg_file = "";
+
                 board_offset_x = (gameboxrow - game.row * (game.cellSize - 1) - 1) / 2 ;
-                board_offset_y = (gameboxcol - game.col*(game.cellSize + 3 - 1) - 1) / 2;
+                board_offset_y = (gameboxcol - game.col*(game.cellSize + 2) - 1) / 2;
                 board_offset_x = (board_offset_x < 1) ? 1 : board_offset_x;
                 board_offset_y = (board_offset_y < 1) ? 1 : board_offset_y;
                 while (!moveSuggestion(game, board_offset_x, board_offset_y, false))  //Check if there is any possible match on the board.
@@ -87,9 +103,10 @@ int main()
                 updateUI(game, start_time);
                 if (kbhit())
                 {
-                    playerAction(game, board_offset_x, board_offset_y, page, background, bg_row, bg_column, cheatWordsCount);
+                    playerAction(game, account, board_offset_x, board_offset_y, page, background, bg_row, bg_column, cheatWordsCount);
                     if (checkMatching(game, background, bg_row, bg_column, board_offset_x, board_offset_y))
                     {
+                        PlaySound(TEXT("SoundSFX/match.wav"), NULL, SND_FILENAME | SND_ASYNC);
                         updateScore(game, account, players);
                         game.move_count--;
                         while (!moveSuggestion(game, board_offset_x, board_offset_y, false) && game.move_count > 0) //After matching 2 tiles, check if there is any possible match left.
@@ -113,6 +130,7 @@ int main()
                         clear();
                         page = main_page;
                     }
+                    freeCharMatrix(background, bg_row);
                     deleteMemBoard(game);
                     initialized = false;
                     break;
@@ -121,6 +139,7 @@ int main()
                 if (page == 1) //Go back to menu
                 {
                     clear();
+                    freeCharMatrix(background, bg_row);
                     deleteMemBoard(game);
                     initialized = false;
                     break;
@@ -137,6 +156,7 @@ int main()
                 {
                     GameOver(game);
                     page = main_page;
+                    freeCharMatrix(background, bg_row);
                     deleteMemBoard(game);
                     initialized = false;
                     break;
@@ -145,7 +165,7 @@ int main()
         }
     }
 
-    freeCharMatrix(background, bg_row);
+    //freeCharMatrix(background, bg_row);
     freeCharMatrix(title, title_row);
     return 0;
 }

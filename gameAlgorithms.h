@@ -1,5 +1,3 @@
-
-
 bool isInMap(GameState game, int x, int y);
 
 /**

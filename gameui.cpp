@@ -139,15 +139,14 @@ void updateScore(GameState &game, savefile &account, PlayerInfo players[])
         account.record[4].date.month = ltm->tm_mon + 1;
         account.record[4].date.year = ltm->tm_year + 1900;
 
-        sortRecord(account.record, 5);
-        if (account.getElo() > players[9].elo)
+        if (account.getElo() > players[MAXPLAYERS - 1].elo)
         {
             if (checkNameOnLB(account, players))
-                sortLB;
+                sortLB(players);
             else
             {
                 players[9].elo = account.getElo();
-                sortLB;
+                sortLB(players);
             }
         }
     }

@@ -12,7 +12,7 @@ Page 9 = Gameplay
 Page 10 = Save game
 */
 
-void generateMenu(savefile &account, GameState &game, PlayerInfo players[], string filename, int &page, int &choice, char** title, int title_row, int title_col, bool &run, bool &continue_game, int &word_count)
+void generateMenu(savefile &account, GameState &game, PlayerInfo players[], string filename, int &page, int &choice, char** title, int title_row, int title_col, bool &run, bool &continue_game, int &word_count, bool &isLogged, string &bg_file)
 {
     char input; 
 
@@ -23,15 +23,20 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
 
         input = getch();
         input = toupper(input);
+        PlaySound(TEXT("SoundSFX/navigate.wav"), NULL, SND_FILENAME | SND_ASYNC);
         switch(input)
         {
             case 'W':
                 if (choice > 1)
+                {
                     choice --;
+                }
                 break;
             case 'S':
-                if (choice < 6)
+                if (choice < 7)
+                {
                     choice ++;
+                }
                 break;
             case ' ':
                 if (choice == 1) //New Game
@@ -49,6 +54,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 else if (choice == 3) //Account info
                 {
                     clear();
+                    displayAccountInfo(account);
                     page = account_page;
                     choice  = 1;
                 }
@@ -63,6 +69,13 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                     clear();
                     page = credit_page;
                     choice = 1;
+                }
+                else if (choice == 6)
+                {
+                    saveGame(filename, account);
+                    isLogged = false;
+                    memset(&account, 0, sizeof(account));
+                    clear();
                 }
                 else    //Quit
                 {
@@ -80,6 +93,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
 
         input = getch();
         input = toupper(input);
+        PlaySound(TEXT("SoundSFX/navigate.wav"), NULL, SND_FILENAME | SND_ASYNC);
         switch (input)
         {
             case 'W':
@@ -117,6 +131,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
 
         input = getch();
         input = toupper(input);
+        PlaySound(TEXT("SoundSFX/navigate.wav"), NULL, SND_FILENAME | SND_ASYNC);
         switch(input)
         {
             case 'W':
@@ -168,6 +183,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
         displayLoadGamePage(account, choice);
         input = getch();
         input = toupper(input);
+        PlaySound(TEXT("SoundSFX/navigate.wav"), NULL, SND_FILENAME | SND_ASYNC);
         switch(input)
         {
             case 'W':
@@ -181,7 +197,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
             case ' ':
                 if (account.state[choice - 1].row != 0) //Start
                 {
-                    loadBoard(game, account, choice - 1);
+                    loadBoard(game, account, choice - 1, bg_file);
                     page = gameplay_page;
                     continue_game = true;
                 }
@@ -194,14 +210,12 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
     }
     else if (page == account_page)
     {
-        displayAccountInfo(account, choice, page);
+        displayAccOptions(choice);
         input = getch();
         input = toupper(input);
+        PlaySound(TEXT("SoundSFX/navigate.wav"), NULL, SND_FILENAME | SND_ASYNC);
         if (checkCheatCode(input, word_count, Cheat_page))
-        {
-            clear();
             page = hack_page;
-        }
         switch(input)
         {
             case 'A':
@@ -209,7 +223,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                     choice --;
                 break;
             case 'D':
-                if (choice < 4)
+                if (choice < 3)
                     choice ++;
                 break;
             case ' ':
@@ -227,11 +241,6 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                     if (changed)
                         saveGame(filename, account);
                 }
-                else if (choice == 3)
-                {
-                    page = hack_page;
-                    clear();
-                }
                 else    //Return to main menu
                 {
                     page = 1;
@@ -245,6 +254,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
         processHacking(account, choice);
         input = getch();
         input = toupper(input);
+        PlaySound(TEXT("SoundSFX/navigate.wav"), NULL, SND_FILENAME | SND_ASYNC);
         switch(input)
         {
             case 'W':
@@ -268,17 +278,20 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 {
                     sortRecord(account.record, 5);
                     saveGame(filename, account);
-                    if (account.getElo() > players[9].elo)
+                    if (account.getElo() > players[MAXPLAYERS - 1].elo || players[MAXPLAYERS - 1].elo == 0)
                     {
                         if (checkNameOnLB(account, players))
-                            sortLB;
+                            sortLB(players);
                         else
                         {
-                            players[9].elo = account.getElo();
-                            sortLB;
+                            players[MAXPLAYERS - 1].elo = account.getElo();
+                            sortLB(players);
                         }
                     }
                     page = account_page;
+                    clear();
+                    displayAccountInfo(account);
+                    choice = 1;
                 }
                 break;
         }
@@ -289,6 +302,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
 
         input = getch();
         input = toupper(input);
+        PlaySound(TEXT("SoundSFX/navigate.wav"), NULL, SND_FILENAME | SND_ASYNC);
         switch(input)
         {
             case 'W':
@@ -314,6 +328,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
     {
         displayLdBoard(players);
         input = getch();
+        PlaySound(TEXT("SoundSFX/navigate.wav"), NULL, SND_FILENAME | SND_ASYNC);
         if (input == 27)
         {
             clear();
@@ -329,6 +344,7 @@ void displayMainMenu(int choice)
     options.push_back("ACCOUNT");
     options.push_back("LEADERBOARD");
     options.push_back("CREDIT");
+    options.push_back("LOG OUT");
     options.push_back("QUIT");
 
     int cellRowSize = 3;
@@ -346,7 +362,7 @@ void displayMainMenu(int choice)
         }
         else
         {
-            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, black, white);
+            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, grey, white);
             posX += cellRowSize;
         }
         
@@ -375,7 +391,7 @@ void displayDifficultyChoice(int choice)
         }
         else
         {
-            drawCell(difficulty[i], posX, posY, cellRowSize, cellColumnSize, black, white);
+            drawCell(difficulty[i], posX, posY, cellRowSize, cellColumnSize, grey, white);
             posX += cellRowSize;
         }
         
@@ -446,11 +462,11 @@ void displayLoadGamePage(savefile account, int choice)
         if (choice == i + 1)
             drawCell(saved_inf, 7 + (cellRowSize+1)*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, yellow, white);
         else
-            drawCell(saved_inf, 7 + (cellRowSize+1)*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, black, white);
+            drawCell(saved_inf, 7 + (cellRowSize+1)*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, grey, white);
     }
 }
 
-void displayAccountInfo(savefile account, int choice, int page)
+void displayAccountInfo(savefile account)
 {
     drawCell("Account Info", 5, 10, 3, 33);
     drawCell(" ", 8, 10, 15, 33);
@@ -492,20 +508,21 @@ void displayAccountInfo(savefile account, int choice, int page)
         cout << "Master";
     else if (avg <= 9200)
         cout << "Challenger";
+}
 
+void displayAccOptions(int choice)
+{
     vector<string> options;
     options.push_back("Change Username");
     options.push_back("Change password");
-    options.push_back("Don't choose here"); 
     options.push_back("Return");
     for (int i = 0; i < options.size(); i++)
     {
         if (choice == i + 1)
             drawCell(options[i], 25 ,(WinColumn - options.size()*22)/2 + i*22 + 1, 3, 22, yellow, white);
         else
-            drawCell(options[i], 25 ,(WinColumn - options.size()*22)/2 + i*22 + 1, 3, 22, black, white);
+            drawCell(options[i], 25 ,(WinColumn - options.size()*22)/2 + i*22 + 1, 3, 22, grey, white);
     }
-
 }
 
 void changeNameForm(savefile &account, string filename, bool &changed)
@@ -613,57 +630,6 @@ void changePasswordForm(savefile &account, bool &changed)
 
 void processHacking(savefile account, int choice)
 {
-    drawCell("Account Info", 5, 10, 3, 33);
-    drawCell(" ", 8, 10, 15, 33);
-    GoTo(9, 12);
-    cout << "Username: " << account.name;
-    GoTo(10, 12);
-    cout << "Password: ";
-    for (int i = 0; i < strlen(account.password); i++)
-        cout << "*";
-
-    drawCell("High Score", 5, 44, 3, 33);
-    drawCell(" ", 8, 44, 15, 33);
-    for (int i = 0; i < 5; i++)
-    {
-        GoTo(9 + 2*i, 46);
-        cout << "1. Date: " << account.record[i].date.day << "/"<< account.record[i].date.month<< "/"<< account.record[i].date.year;
-        GoTo(9 + 2*i+1, 46);
-        cout << "Score: " << account.record[i].points;
-    }
-
-    drawCell("Summary", 5, 78, 3, 38);
-    drawCell(" ", 8, 78, 15, 38);
-    int avg = 0, count = 0;
-    for (int i = 0; i < 5; i++)
-    {
-        if(account.record[i].points > 0)
-        {
-            avg += account.record[i].points;
-            count++;
-        }
-    }
-    if (count > 0)
-        avg/=count;
-
-    GoTo(10, 80);
-    cout << "Your elo is: " << avg;
-
-    GoTo(11, 80);
-    cout << "Your current rank is: ";
-    if (avg <= 1600)
-        cout << "Bronze";
-    else if (avg <= 3200)
-        cout << "Silver";
-    else if (avg <= 4800)
-        cout << "Gold";
-    else if (avg <= 6000)
-        cout << "Platinum";
-    else if (avg <= 7600)
-        cout << "Master";
-    else if (avg <= 9200)
-        cout << "Challenger";
-
     for (int i = 0; i < 5; i++)
     {
         GoTo(9 + 2*i+1, 53);
@@ -677,7 +643,7 @@ void processHacking(savefile account, int choice)
     if (choice == 6)
         drawCell("Save", 25, (WinColumn - 22) / 2, 3, 22, yellow, white);
     else
-        drawCell("Save", 25, (WinColumn - 22) / 2, 3, 22, black, white);
+        drawCell("Save", 25, (WinColumn - 22) / 2, 3, 22, grey, white);
 }
 
 bool checkCheatCode(char c, int &count, string cheatCode)
@@ -735,51 +701,9 @@ void displaySavePage(GameState game, savefile account, int choice)
         if (choice == i + 1)
             drawCell(saved_inf, 7 + 5*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, yellow, white);
         else
-            drawCell(saved_inf, 7 + 5*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, black, white);
+            drawCell(saved_inf, 7 + 5*i, (WinColumn - saved_inf.length())/2, cellRowSize, saved_inf.length() + 5, grey, white);
     }
 }
-
-void getLdBoard(PlayerInfo players[], string account_file)
-{
-    ifstream file(account_file, ios::binary);
-    if (!file)
-    {
-        cout << "Error, missing " << account_file << ".";
-        getch();
-        return;
-    }
-
-    savefile tempAccount;
-    int count = 0;
-    while(file.read((char*)&tempAccount, sizeof(tempAccount)))
-    {
-        if (tempAccount.getElo() > players[9].elo)
-        {
-            mask(tempAccount.name, tempAccount.mask);
-            players[count].name = tempAccount.name;
-            players[count].elo = tempAccount.getElo();
-            players[count].rank = players[count].getRank();
-            count++;
-
-            sortLB(players);
-        }
-    }
-
-    file.close();
-}
-
-void sortLB(PlayerInfo arr[]) {
-    for (int i = 1; i < 10; i++) {
-        PlayerInfo key = arr[i];
-        int j = i - 1;
-        while (j >= 0 && arr[j].elo < key.elo) {
-            arr[j + 1] = arr[j];
-            j--;
-        }
-        arr[j + 1] = key;
-    }
-}
-
 
 void displayLdBoard(PlayerInfo players[])
 {
@@ -798,7 +722,7 @@ void displayLdBoard(PlayerInfo players[])
     drawCell("Rating", 5, (WinColumn - totalsize)/2 + numbersize + namesize, 3, ratingsize);
     drawCell("Rank", 5, (WinColumn - totalsize)/2 + numbersize + namesize + ratingsize, 3, ranksize);
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAXPLAYERS; i++)
     {
         GoTo(8 + 2*i, (WinColumn - totalsize)/2 + numbersize/2);
         cout << i+1;
@@ -816,7 +740,7 @@ void displayLdBoard(PlayerInfo players[])
 
 bool checkNameOnLB(savefile account, PlayerInfo players[])
 {
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < MAXPLAYERS; i++)
         if (players[i].name == account.name)
             return true;
 

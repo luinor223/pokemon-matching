@@ -238,9 +238,7 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
     }
     else 
         drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, white, black, 0);
-    
-    
-    
+        
     // move the cursor
     if (isInMap(game, cur.x + x, cur.y + y)) 
     {
@@ -309,7 +307,7 @@ bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw)
     return false;
 }
 
-void playerAction(GameState &game, int  offset_x, int offset_y, int &page, char** background, char bg_row, char bg_column, int cheatWordsCount[]) 
+void playerAction(GameState &game,savefile &account, int  offset_x, int offset_y, int &page, char** background, char bg_row, char bg_column, int cheatWordsCount[]) 
 {
     char c = getch(); // get direct input
     if (checkCheatCode(c, cheatWordsCount[0], Cheat_shuffle))
@@ -324,15 +322,19 @@ void playerAction(GameState &game, int  offset_x, int offset_y, int &page, char*
     int x = 0, y = 0;
     switch (c){ 
     case 's':
+        PlaySound(TEXT("SoundSFX/move.wav"), NULL, SND_FILENAME | SND_ASYNC);
         x = 1;
         break;
     case 'd':
+        PlaySound(TEXT("SoundSFX/move.wav"), NULL, SND_FILENAME | SND_ASYNC);
         y = 1;
         break;
     case 'a':
+        PlaySound(TEXT("SoundSFX/move.wav"), NULL, SND_FILENAME | SND_ASYNC);
         y = -1;
         break;
     case 'w':
+        PlaySound(TEXT("SoundSFX/move.wav"), NULL, SND_FILENAME | SND_ASYNC);
         x = -1;
         break;
     case ' ':
@@ -363,6 +365,7 @@ void playerAction(GameState &game, int  offset_x, int offset_y, int &page, char*
         game.help_count = 3;
         game.shuffle_count = 3;
         page = main_page;
+        sortRecord(account.record, 5);
         break;
     case 'h':
         if (game.help_count > 0)

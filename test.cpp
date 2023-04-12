@@ -1,8 +1,11 @@
-#include <iostream>
-#include <windows.h>
-#include <mmsystem.h>
+#include "main.h"
+#include "header.h"
+
+using namespace std;
 
 int main()
 {
-    PlaySound(TEXT("recycle.wav"), NULL, SND_FILENAME);
+    savefile account;
+    bool run = true;
+    displayLoginRegisterMenu(account, "sample.bin", run);
 }

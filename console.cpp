@@ -23,22 +23,6 @@ void SetWindowSize(SHORT width, SHORT height)
     SetConsoleWindowInfo(hStdout, 1, &WindowSize);
 }
 
-void setConsoleColors() {
-    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-    COORD pos = { 0, 0 };
-    DWORD written;
-    CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
-
-    // Save current console buffer info
-    GetConsoleScreenBufferInfo(console, &consoleInfo);
-
-    // Fill console buffer with white background
-    FillConsoleOutputAttribute(console, BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE, consoleInfo.dwSize.X * consoleInfo.dwSize.Y, pos, &written);
-
-    // Set console cursor position to top-left corner
-    SetConsoleCursorPosition(console, pos);
-}
-
 void SetColor(int backgound_color = white, int text_color = black)
 {
     HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);

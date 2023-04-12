@@ -20,6 +20,7 @@
 #define PASSSIZE 50
 #define BOARDSIZE 999
 #define URLSIZE 100
+#define MAXPLAYERS 10
 
 using namespace std;
 
@@ -72,9 +73,7 @@ struct GameState{
     int col = 6;
     Point cur {0, 0};
     int move_count = 0;
-
     int difficulty = 0; //0:Custom, 1: Easy,  2: Medium,  3: Hard
-
     int cellSize = 5;
     double total_time = 0;
     int mode = 1; //1: Normal, 2: Shift left, 3: Shift right, 4: Shift up, 5: Shift down
@@ -85,7 +84,7 @@ struct GameState{
     int shuffle_count = 3;
 };
 
-struct State{ //Representing a board state
+struct SaveState{ //Representing a board state
     int row = 0, col = 0; // Size of the board game
     int cur_x = 0, cur_y = 0; // Current cursor position
     char board[BOARDSIZE] = {0}; // Current board state
@@ -130,7 +129,7 @@ struct savefile{
     ///////////////////////////
 
     Record record[5]; // List of sorted best records
-    State state[5]; // List of save state
+    SaveState state[5] = {{0, 0, 0}, 0, 0}; // List of save state
 
     int getElo(){
         int avg = 0, count = 0;
@@ -165,4 +164,6 @@ struct PlayerInfo {
             return "Master";
         return "Challenger";
     }
+
+    
 };

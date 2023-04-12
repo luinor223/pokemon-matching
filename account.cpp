@@ -8,7 +8,7 @@ void mask(char text[], char mask)
     }
 }
 
-void processReg(string filename, char* name, char* password, savefile &account, bool &isLogged)
+void processReg(string filename, char* name, char* password, savefile &account, bool &isLogged, PlayerInfo players[])
 {
     fstream file(filename, ios::binary | ios::in | ios::out); // open file in read and write mode
 
@@ -45,24 +45,27 @@ void processReg(string filename, char* name, char* password, savefile &account, 
         strcpy(account.name, name);
         strcpy(account.password, password);
         account.mask = 'A' + rand() % 26;
-        mask(account.name, account.mask);
-        mask(account.password, account.mask);
+        mask(account.name, account.mask);  //mask to write into file
+        mask(account.password, account.mask);  //mask to write into file
         account.position = position;
 
         file.write((char*)&account, sizeof(account));
+        for (int i = 0; i < 5; i++)
+            cout << account.record[i].points << " ";
         cout << "Registration successful! Press any key to continue...";
         getch();
         isLogged = true;
+        getLdBoard(players, filename);
         clear();
 
-        mask(account.name, account.mask);
-        mask(account.password, account.mask);
+        mask(account.name, account.mask);   //unmask to display in-game
+        mask(account.password, account.mask);   //unmask to display in-game
     }
 
     file.close(); // close file
 }
 
-void processLogin(string filename, char* name, char* password, savefile &account, bool &isLogged)
+void processLogin(string filename, char* name, char* password, savefile &account, PlayerInfo players[] ,bool &isLogged)
 {
     ifstream file(filename, ios::binary);
     if (!file.is_open()) // check if file is opened successfully
@@ -85,6 +88,7 @@ void processLogin(string filename, char* name, char* password, savefile &account
             {
                 cout << "Login successful! Press any key to continue...";
                 getch();
+                getLdBoard(players, filename);
                 isLogged = true;
                 account.position = position;
                 clear();
@@ -102,13 +106,15 @@ void processLogin(string filename, char* name, char* password, savefile &account
     {
         cout << "Username or Password is not correct! Press any key to go back...";
         getch();
+        memset(&account, 0, sizeof(account));
         clear();
     }
     
+
     file.close();  
 }
 
-void displayForm(string filename, savefile &account, int choice, bool &isLogged)
+void displayForm(string filename, savefile &account, PlayerInfo players[], int choice, bool &isLogged)
 {
     string title = "";
     char temp_name[NAMESIZE];
@@ -141,12 +147,12 @@ void displayForm(string filename, savefile &account, int choice, bool &isLogged)
     GoTo(posX + 9, (WinColumn - 50 - box_size) / 2 + 12);
 
     if (choice == 1)
-        processLogin(filename, temp_name, temp_password, account, isLogged);
+        processLogin(filename, temp_name, temp_password, account, players, isLogged);
     else
-        processReg(filename, temp_name, temp_password, account, isLogged);
+        processReg(filename, temp_name, temp_password, account, isLogged, players);
 }
 
-void displayLoginRegisterMenu(savefile &account, string filename, char** title, int title_row, int title_col, bool &run)
+void displayLoginRegisterMenu(savefile &account, string filename, PlayerInfo players[], char** title, int title_row, int title_col, bool &run, bool &isLogged, int &choice)
 {
     string username;
 
@@ -157,59 +163,52 @@ void displayLoginRegisterMenu(savefile &account, string filename, char** title, 
     options.push_back("LOG IN");
     options.push_back("REGISTER");
     options.push_back("QUIT");
-
-    int choice = 1;
-    bool isLogged = false;
-    bool displayMenu = true;
     
-    while (!isLogged)
-    {
-        displayGameTitle(title, title_row, title_col);
+    displayGameTitle(title, title_row, title_col);
 
-        int posX = 15, posY = (WinColumn - cellColumnSize) / 2;
-        for (int i = 0; i < options.size(); i++)
+    int posX = 15, posY = (WinColumn - cellColumnSize) / 2;
+    for (int i = 0; i < options.size(); i++)
+    {
+        if (choice == i + 1)
         {
-            if (choice == i + 1)
+            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
+            posX += 4;
+        }
+        else
+        {
+            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, white, black);
+            posX += 4;
+        }
+    }
+    char input = getch();
+    input = toupper(input);
+    switch(input)
+    {
+        case 'W':
+            if (choice > 1 )
+                choice --;
+            break;
+        case 'S':
+            if (choice < options.size())
+                choice ++;
+            break;
+        case ' ':
+            if (choice == 1 || choice == 2)
             {
-                drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
-                posX += 4;
+                clear();
+                displayGameTitle (title, title_row, title_col);
+                displayForm(filename, account, players, choice, isLogged);
             }
             else
             {
-                drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, white, black);
-                posX += 4;
+                run = false;
+                return;
             }
-        }
-        char input = getch();
-        input = toupper(input);
-        switch(input)
-        {
-            case 'W':
-                if (choice > 1 )
-                    choice --;
-                break;
-            case 'S':
-                if (choice < options.size())
-                    choice ++;
-                break;
-            case ' ':
-                if (choice == 1 || choice == 2)
-                {
-                    clear();
-                    displayGameTitle (title, title_row, title_col);
-                    displayForm(filename, account, choice, isLogged);
-                }
-                else
-                {
-                    run = false;
-                    return;
-                }
-                break;
-        }
+            break;
     }
 }
 
-void loadBoard(GameState &game, savefile account, int index) 
+void loadBoard(GameState &game, savefile account, int index, string &bg_file) 
 {
     game.row = account.state[index].row;
     game.col = account.state[index].col;
@@ -229,6 +228,8 @@ void loadBoard(GameState &game, savefile account, int index)
         }
     }
     game.move_count /= 2;
+
+    bg_file = account.state[index].file_background;
 
     game.time_left = (account.state[index].time_left > 0) ? account.state[index].time_left : 120;
     game.score = account.state[index].score;
@@ -255,6 +256,45 @@ void saveBoard(GameState game, savefile &account, int index)
     account.state[index].stage = game.stage;
     account.state[index].help_count = game.help_count;
     account.state[index].shuffle_count = game.shuffle_count;
+}
+
+void getLdBoard(PlayerInfo players[], string account_file)
+{
+    ifstream file(account_file, ios::binary);
+    if (!file)
+    {
+        cout << "Error, missing " << account_file << ".";
+        getch();
+        return;
+    }
+
+    savefile tempAccount;
+    while(file.read((char*)&tempAccount, sizeof(tempAccount)))
+    {
+        if (tempAccount.getElo() > players[MAXPLAYERS - 1].elo || players[MAXPLAYERS - 1].elo == 0)
+        {
+            mask(tempAccount.name, tempAccount.mask);
+            players[MAXPLAYERS - 1].name = tempAccount.name;
+            players[MAXPLAYERS - 1].elo = tempAccount.getElo();
+            players[MAXPLAYERS - 1].rank = players[MAXPLAYERS - 1].getRank();
+
+            sortLB(players);
+        }
+    }
+
+    file.close();
+}
+
+void sortLB(PlayerInfo arr[]) {
+    for (int i = 1; i < MAXPLAYERS; i++) {
+        PlayerInfo key = arr[i];
+        int j = i - 1;
+        while (j >= 0 && arr[j].elo < key.elo) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
 }
 
 void saveGame(string filename, savefile account)

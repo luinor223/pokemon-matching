@@ -3,6 +3,8 @@
 void initialize_board(GameState &game, int &alphabets)
 {
     if (game.stage == 1)
+    {
+        game.mode = 1;
         switch (game.difficulty)
         {
             case 1:
@@ -28,26 +30,42 @@ void initialize_board(GameState &game, int &alphabets)
                     game.total_time = 120;
                 break;
         }
+    }
     else
+    {
+        game.total_time = game.time_left + bouns_time;
         switch (game.difficulty)
             {
                 case 1:
                     game.total_time = game.time_left + 60;
                     alphabets = 8;
+                    if (game.stage < 6)
+                        game.mode = game.stage;
+                    else
+                        game.mode = rand() % 4 + 1;
                     break;
                 case 2:
                     game.total_time = game.time_left + 90;
                     alphabets = 10;
+                    if (game.stage < 6)
+                        game.mode = game.stage;
+                    else
+                        game.mode = rand() % 4 + 1;
                     break;
                 case 3:
                     game.total_time = game.time_left + 120;
                     alphabets = 12;
+                    if (game.stage < 6)
+                        game.mode = game.stage;
+                    else
+                        game.mode = rand() % 4 + 1;
                     break;
                 default:
                     game.total_time = game.time_left + 60;
                     alphabets = 10;
                     break;
             }
+    }
     
     game.move_count = (game.row * game.col) / 2;
 }
