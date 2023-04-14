@@ -6,85 +6,6 @@ bool isInMap(GameState game, int x, int y)
     return x >= 0 && x < game.row  && y >= 0 && y < game.col;
 }
 
-// This function sets up the game board according to the game mode.
-void setBoard(GameState game)
-{
-    if (game.mode == 1) // If the game mode is "not shift", do nothing.
-        return;
-    if (game.mode == 2) // If the game mode is "shift left", shift all tiles in each row to the left as far as possible.
-    {
-        for (int i = 0; i < game.row; i++)
-        {
-            for (int j = 0; j < game.col; j++)
-            {
-                if (game.board[i][j] == '\0')
-                {
-                    for (int k = j+1; k < game.col; k++)
-                        if (game.board[i][k] != '\0')
-                        {
-                            swap(game.board[i][j], game.board[i][k]);
-                            break;
-                        }
-                }
-            }
-        }          
-    }
-    if (game.mode == 3) // If the game mode is "shift right", shift all tiles in each row to the right as far as possible.
-    {
-        for (int i = 0; i < game.row; i++)
-        {
-            for (int j = game.col - 1; j >= 0; j--)
-            {
-                if (game.board[i][j] == '\0')
-                {
-                    for (int k = j-1; k >= 0; k--)
-                        if (game.board[i][k] != '\0')
-                        {
-                            swap(game.board[i][j], game.board[i][k]);
-                            break;
-                        }
-                }
-            }
-        }  
-    }
-    if (game.mode == 4) // If the game mode is "shift up", shift all tiles in each column up as far as possible.
-    {
-        for (int j = 0; j < game.col; j++)
-        {
-            for (int i = 0; i < game.row; i++)
-            {
-                if (game.board[i][j] == '\0')
-                {
-                    for (int k = i+1; k < game.row; k++)
-                        if (game.board[k][j] != '\0')
-                        {
-                            swap(game.board[i][j], game.board[k][j]);
-                            break;
-                        }
-                }
-            }
-        }  
-    }
-    if (game.mode == 5) // If the game mode is "shift down", shift all tiles in each column down as far as possible.
-    {
-        for (int j = 0; j < game.col; j++)
-        {
-            for (int i =  game.row - 1; i >= 0; i--)
-            {
-                if (game.board[i][j] == '\0')
-                {
-                    for (int k = i-1; k >= 0; k--)
-                        if (game.board[k][j] != '\0')
-                        {
-                            swap(game.board[i][j], game.board[k][j]);
-                            break;
-                        }
-                }
-            }
-        }  
-    }
-}
-
 // This function finds a path between two given positions (x1, y1) and (x2, y2) on the game board.
 vector<pair<int, int>> findPath(GameState game, int _x, int _y, int x, int y)
 {
@@ -217,16 +138,16 @@ void drawSelectedPoint(GameState game, vector <Point> selectedPoint, int offset_
     }
 }
 
-void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y, char** background)
+void drawSelectingPoint(GameState &game, int x, int y, int offset_x, int offset_y, char** background)
 {
     // deselecting the old cell
     string temp;
     int mode;
-    temp = game.board[cur.x][cur.y];
-    if (game.board[cur.x][cur.y] == '\0')
+    temp = game.board[game.cur.x][game.cur.y];
+    if (game.board[game.cur.x][game.cur.y] == '\0')
     {
-        int startX = offset_x + cur.x*game.cellSize - cur.x;
-        int startY = offset_y + cur.y*(game.cellSize + 3) - cur.y;
+        int startX = offset_x + game.cur.x*game.cellSize - game.cur.x;
+        int startY = offset_y + game.cur.y*(game.cellSize + 3) - game.cur.y;
         for (int i = 1; i < game.cellSize-1; i++)
         {
             GoTo(startX + i, startY + 1);
@@ -237,34 +158,35 @@ void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y
         }
     }
     else 
-        drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, white, black, 0);
+        drawCell(temp, offset_x + game.cur.x*game.cellSize - game.cur.x, offset_y + game.cur.y*(game.cellSize + 3) - game.cur.y, game.cellSize, game.cellSize + 3, white, black, 0);
         
     // move the cursor
-    if (isInMap(game, cur.x + x, cur.y + y)) 
+    if (isInMap(game, game.cur.x + x, game.cur.y + y)) 
     {
-        cur.x += x;
-        cur.y += y;
+        game.cur.x += x;
+        game.cur.y += y;
     } 
     else
     {
-        if (cur.x + x >= game.row)
-            cur.x = 0;
-        else if (cur.x + x < 0)
-            cur.x = game.row - 1;
-        else if (cur.y + y >= game.col)
-            cur.y = 0;
-        else if (cur.y + y < 0)
-            cur.y = game.col - 1;
+        if (game.cur.x + x >= game.row)
+            game.cur.x = 0;
+        else if (game.cur.x + x < 0)
+            game.cur.x = game.row - 1;
+        else if (game.cur.y + y >= game.col)
+            game.cur.y = 0;
+        else if (game.cur.y + y < 0)
+            game.cur.y = game.col - 1;
     }
     // selecting the new cell
-    temp = game.board[cur.x][cur.y];
-    if (game.board[cur.x][cur.y] == '\0')
+    temp = game.board[game.cur.x][game.cur.y];
+    if (game.board[game.cur.x][game.cur.y] == '\0')
         mode = 1;
     else
         mode = 0;
     
-    drawCell(temp, offset_x + cur.x*game.cellSize - cur.x, offset_y + cur.y*(game.cellSize + 3) - cur.y, game.cellSize, game.cellSize + 3, grey, white, mode); // select the new one
+    drawCell(temp, offset_x + game.cur.x*game.cellSize - game.cur.x, offset_y + game.cur.y*(game.cellSize + 3) - game.cur.y, game.cellSize, game.cellSize + 3, grey, white, mode); // select the new one
 }
+
 
 bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw)
 {
@@ -310,6 +232,8 @@ bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw)
 void playerAction(GameState &game,savefile &account, int  offset_x, int offset_y, int &page, char** background, char bg_row, char bg_column, int cheatWordsCount[]) 
 {
     char c = getch(); // get direct input
+
+    /*Check if player enter the right cheat code*/
     if (checkCheatCode(c, cheatWordsCount[0], Cheat_shuffle))
         game.shuffle_count += 3;
     if (checkCheatCode(c, cheatWordsCount[1], Cheat_help))
@@ -319,6 +243,7 @@ void playerAction(GameState &game,savefile &account, int  offset_x, int offset_y
     if (checkCheatCode(c, cheatWordsCount[3], Cheat_time))
         game.total_time += bouns_time;
 
+    /*Handle player's input*/
     int x = 0, y = 0;
     switch (c){ 
     case 's':
@@ -337,26 +262,44 @@ void playerAction(GameState &game,savefile &account, int  offset_x, int offset_y
         PlaySound(TEXT("SoundSFX/move.wav"), NULL, SND_FILENAME | SND_ASYNC);
         x = -1;
         break;
-    case ' ':
+    case ' ':   //Select/Unselect the cell
         {
-            if (game.board[cur.x][cur.y] != '\0') // if the cur cell has block
+            if (game.board[game.cur.x][game.cur.y] != '\0') // if the cur cell has block
             {
-                if (findPoint(selectedPoint, cur) == true) // if already selected
+                if (findPoint(selectedPoint, game.cur) == true) // if already selected
                 {
                     // Deselect point
                     for (int i = 0; i < selectedPoint.size(); i++)
-                        if (selectedPoint[i].x == cur.x && selectedPoint[i].y == cur.y)
+                        if (selectedPoint[i].x == game.cur.x && selectedPoint[i].y == game.cur.y)
                             selectedPoint.erase(selectedPoint.begin() + i);
                 }
                 else // if not, select that point
                 {
                     if (selectedPoint.size() < Max_NumofSelectedPoint) // check if number of selected point exceed the limit
                     {
-                        selectedPoint.push_back({cur.x, cur.y});
+                        selectedPoint.push_back({game.cur.x, game.cur.y});
                     }
                 }
             }
         }
+        break;
+    case 'h':   //Move suggestion
+        if (game.help_count > 0)
+        {
+            game.help_count--;
+            moveSuggestion(game, offset_x, offset_y, true);
+        }
+        break;
+    case 'r':   //Shuffle the board
+        if (game.shuffle_count > 0)
+        {
+            game.shuffle_count--;
+            shuffle_board(game);
+            showBoard(game, background, bg_row, bg_column, offset_x, offset_y); //show the new board
+        }
+        break;
+    case 'p':   //Save game
+        page = save_page;
         break;
     case 27: //Esc = 27
         game.score = 0;
@@ -366,24 +309,6 @@ void playerAction(GameState &game,savefile &account, int  offset_x, int offset_y
         game.shuffle_count = 3;
         page = main_page;
         sortRecord(account.record, 5);
-        break;
-    case 'h':
-        if (game.help_count > 0)
-        {
-            game.help_count--;
-            moveSuggestion(game, offset_x, offset_y, true);
-        }
-        break;
-    case 'r':
-        if (game.shuffle_count > 0)
-        {
-            game.shuffle_count--;
-            shuffle_board(game);
-            showBoard(game, background, bg_row, bg_column, offset_x, offset_y); //show the new board
-        }
-        break;
-    case 'p':
-        page = save_page;
         break;
     }
     if (x != 0 || y != 0) // there is a movement input

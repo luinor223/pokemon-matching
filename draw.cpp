@@ -87,15 +87,3 @@ void drawLine(int x1, int y1, int x2, int y2, int mode)
     }
 }
 
-void displayGameTitle(char** title, int title_row, int title_col)
-{
-    SetColor();
-    for (int i = 0; i < title_row; i++)
-    {
-        GoTo(i, (WinColumn - title_col) / 2);
-        for (int j = 0; j < title_col; j++)
-        {
-            cout << title[i][j];
-        }
-    }
-}

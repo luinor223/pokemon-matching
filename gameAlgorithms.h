@@ -38,5 +38,5 @@ bool checkMatching(GameState game, char** background, int bg_row, int bg_column,
 
 bool findPoint(vector <Point> v, Point a);
 void drawSelectedPoint(GameState game, vector <Point> selectedPoint, int offset_x, int offset_y);
-void drawSelectingPoint(GameState game, int x, int y, int offset_x, int offset_y, char** background);
-void playerAction(GameState &game, int  offset_x, int offset_y, int &page, char** background, char bg_row, char bg_column) ;
+void drawSelectingPoint(GameState &game, int x, int y, int offset_x, int offset_y, char** background);
+void playerAction(GameState &game,savefile &account, int  offset_x, int offset_y, int &page, char** background, char bg_row, char bg_column, int cheatWordsCount[]); 

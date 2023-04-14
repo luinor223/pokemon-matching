@@ -1,5 +1,7 @@
 #include "account.h"
 
+const char maskCh[] = {'=', ';', '+', '-', '<', '>'};
+
 void mask(char text[], char mask)
 {
     for (int i = 0; i < strlen(text); i++)
@@ -44,7 +46,7 @@ void processReg(string filename, char* name, char* password, savefile &account, 
 
         strcpy(account.name, name);
         strcpy(account.password, password);
-        account.mask = 'A' + rand() % 26;
+        account.mask = maskCh[rand() % 6];
         mask(account.name, account.mask);  //mask to write into file
         mask(account.password, account.mask);  //mask to write into file
         account.position = position;
@@ -114,100 +116,6 @@ void processLogin(string filename, char* name, char* password, savefile &account
     file.close();  
 }
 
-void displayForm(string filename, savefile &account, PlayerInfo players[], int choice, bool &isLogged)
-{
-    string title = "";
-    char temp_name[NAMESIZE];
-    char temp_password[PASSSIZE];
-    if (choice == 1)
-        title = "LOG IN";
-    else
-        title = "REGISTER";
-    int box_size = 20;
-
-    int posX = 15;
-
-    GoTo(posX, (WinColumn - title.length()) / 2);
-    cout << title;
-    
-    GoTo(posX + 4, (WinColumn - 10 - box_size) / 2);
-    cout << "Username: ";
-    drawCell(" ", posX + 3, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
-
-    GoTo(posX + 7, (WinColumn - 10 - box_size) / 2);
-    cout << "Password: ";
-    drawCell(" ", posX + 6, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
-
-    GoTo(posX + 4, (WinColumn - 10 - box_size) / 2 + 12);
-    cin.getline(temp_name, 20);
-
-    GoTo(posX + 7, (WinColumn - 10 - box_size) / 2 + 12);
-    cin.getline(temp_password, 20);
-
-    GoTo(posX + 9, (WinColumn - 50 - box_size) / 2 + 12);
-
-    if (choice == 1)
-        processLogin(filename, temp_name, temp_password, account, players, isLogged);
-    else
-        processReg(filename, temp_name, temp_password, account, isLogged, players);
-}
-
-void displayLoginRegisterMenu(savefile &account, string filename, PlayerInfo players[], char** title, int title_row, int title_col, bool &run, bool &isLogged, int &choice)
-{
-    string username;
-
-    int cellRowSize = 3;
-    int cellColumnSize = 15;
-
-    vector<string> options;
-    options.push_back("LOG IN");
-    options.push_back("REGISTER");
-    options.push_back("QUIT");
-    
-    displayGameTitle(title, title_row, title_col);
-
-    int posX = 15, posY = (WinColumn - cellColumnSize) / 2;
-    for (int i = 0; i < options.size(); i++)
-    {
-        if (choice == i + 1)
-        {
-            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
-            posX += 4;
-        }
-        else
-        {
-            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, white, black);
-            posX += 4;
-        }
-    }
-    char input = getch();
-    input = toupper(input);
-    switch(input)
-    {
-        case 'W':
-            if (choice > 1 )
-                choice --;
-            break;
-        case 'S':
-            if (choice < options.size())
-                choice ++;
-            break;
-        case ' ':
-            if (choice == 1 || choice == 2)
-            {
-                clear();
-                displayGameTitle (title, title_row, title_col);
-                displayForm(filename, account, players, choice, isLogged);
-            }
-            else
-            {
-                run = false;
-                return;
-            }
-            break;
-    }
-}
-
 void loadBoard(GameState &game, savefile account, int index, string &bg_file) 
 {
     game.row = account.state[index].row;
@@ -229,6 +137,7 @@ void loadBoard(GameState &game, savefile account, int index, string &bg_file)
     }
     game.move_count /= 2;
 
+    mask(account.state[index].file_background, account.mask);
     bg_file = account.state[index].file_background;
 
     game.time_left = (account.state[index].time_left > 0) ? account.state[index].time_left : 120;
@@ -271,6 +180,7 @@ void getLdBoard(PlayerInfo players[], string account_file)
     savefile tempAccount;
     while(file.read((char*)&tempAccount, sizeof(tempAccount)))
     {
+        mask(tempAccount.name, tempAccount.mask);
         updateLdBoard(players, tempAccount);
     }
 
@@ -308,6 +218,15 @@ void sortLB(PlayerInfo arr[]) {
         }
         arr[j + 1] = key;
     }
+}
+
+int checkNameOnLB(savefile account, PlayerInfo players[])
+{
+    for (int i = 0; i < MAXPLAYERS; i++)
+        if (players[i].name == account.name)
+            return i;
+
+    return -1;
 }
 
 void saveGame(string filename, savefile account)

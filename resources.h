@@ -45,7 +45,7 @@ const string Cheat_page = "H4CK";
 const string Cheat_shuffle = "s4uffle";
 const string Cheat_help = "call911";
 const string Cheat_score = "easygame";
-const string Cheat_time = "bounstime";
+const string Cheat_time = "bonustime";
 
 const int bouns_time = 60;
 
@@ -64,7 +64,6 @@ struct Point{
     int x, y;
 };
 
-Point cur{0, 0};
 vector <Point> selectedPoint;
 
 struct GameState{

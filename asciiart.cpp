@@ -1,6 +1,6 @@
-#include "background.h"
+#include "asciiart.h"
 
-void getFileContent(string filename, char **&background, int &row, int &col)
+void loadArtFromFile(string filename, char **&background, int &row, int &col)
 {
     ifstream File(filename);
     string result = "";
@@ -37,6 +37,19 @@ void printBg(char** background, int bg_row, int bg_column)
         GoTo(i + (gameboxrow - bg_row) / 2, (gameboxcol - bg_column) / 2);
         for (int j = 0; j < bg_column; j++)
             cout << background[i][j];
+    }
+}
+
+void displayGameTitle(char** title, int title_row, int title_col)
+{
+    SetColor();
+    for (int i = 0; i < title_row; i++)
+    {
+        GoTo(i, (WinColumn - title_col) / 2);
+        for (int j = 0; j < title_col; j++)
+        {
+            cout << title[i][j];
+        }
     }
 }
 

@@ -9,4 +9,5 @@ void saveBoard(GameState game, savefile &account, int index);
 void getLdBoard(PlayerInfo players[], string account_file);
 void updateLdBoard(PlayerInfo players[], savefile account);
 void sortLB(PlayerInfo arr[]);
+int checkNameOnLB(savefile account, PlayerInfo players[]);
 void saveGame(string filename, savefile account);

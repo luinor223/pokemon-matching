@@ -1,11 +1,15 @@
-#include "main.h"
-#include "header.h"
-
-using namespace std;
+#include "resources.h"
 
 int main()
 {
+    fstream file("save\\sample.bin", ios::in | ios::binary);
     savefile account;
-    bool run = true;
-    displayLoginRegisterMenu(account, "sample.bin", run);
+
+    file.seekg(0, ios::end);
+    int size = file.tellg();
+    cout <<endl;
+    cout << "sample.bin size: " << size << " bytes." << endl;
+    cout << "savefile struct size: " << sizeof(account) << " bytes." << endl;
+
+    
 }

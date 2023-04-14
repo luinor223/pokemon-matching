@@ -104,6 +104,85 @@ void make_board(GameState &game) {
     }
 }
 
+// This function sets up the game board according to the game mode.
+void setBoard(GameState game)
+{
+    if (game.mode == 1) // If the game mode is "not shift", do nothing.
+        return;
+    if (game.mode == 2) // If the game mode is "shift left", shift all tiles in each row to the left as far as possible.
+    {
+        for (int i = 0; i < game.row; i++)
+        {
+            for (int j = 0; j < game.col; j++)
+            {
+                if (game.board[i][j] == '\0')
+                {
+                    for (int k = j+1; k < game.col; k++)
+                        if (game.board[i][k] != '\0')
+                        {
+                            swap(game.board[i][j], game.board[i][k]);
+                            break;
+                        }
+                }
+            }
+        }          
+    }
+    if (game.mode == 3) // If the game mode is "shift right", shift all tiles in each row to the right as far as possible.
+    {
+        for (int i = 0; i < game.row; i++)
+        {
+            for (int j = game.col - 1; j >= 0; j--)
+            {
+                if (game.board[i][j] == '\0')
+                {
+                    for (int k = j-1; k >= 0; k--)
+                        if (game.board[i][k] != '\0')
+                        {
+                            swap(game.board[i][j], game.board[i][k]);
+                            break;
+                        }
+                }
+            }
+        }  
+    }
+    if (game.mode == 4) // If the game mode is "shift up", shift all tiles in each column up as far as possible.
+    {
+        for (int j = 0; j < game.col; j++)
+        {
+            for (int i = 0; i < game.row; i++)
+            {
+                if (game.board[i][j] == '\0')
+                {
+                    for (int k = i+1; k < game.row; k++)
+                        if (game.board[k][j] != '\0')
+                        {
+                            swap(game.board[i][j], game.board[k][j]);
+                            break;
+                        }
+                }
+            }
+        }  
+    }
+    if (game.mode == 5) // If the game mode is "shift down", shift all tiles in each column down as far as possible.
+    {
+        for (int j = 0; j < game.col; j++)
+        {
+            for (int i =  game.row - 1; i >= 0; i--)
+            {
+                if (game.board[i][j] == '\0')
+                {
+                    for (int k = i-1; k >= 0; k--)
+                        if (game.board[k][j] != '\0')
+                        {
+                            swap(game.board[i][j], game.board[k][j]);
+                            break;
+                        }
+                }
+            }
+        }  
+    }
+}
+
 void deleteMemBoard(GameState &game)
 {
     for (int i = 0; i < game.row; i++)

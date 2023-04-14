@@ -90,6 +90,7 @@ void updateUI(GameState &game, int start_time)
         GoTo(WinRow - 3, int(game.time_left/game.total_time * (WinColumn - 20)) + 14);
         for (int i = 0; i < (WinColumn - 20) / game.total_time; i++)
             cout << " ";
+        cout << " ";
     }
 }
 

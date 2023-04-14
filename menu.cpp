@@ -1,4 +1,110 @@
 #include "menu.h"
+
+
+/// @brief This function generate the login/register menu
+/// @param account a struct for the file saving
+/// @param account_file name of the file used for saving accounts
+/// @param players a struct used to store leaderboard info
+/// @param title game title (2D pointer)
+/// @param title_row 
+/// @param title_col 
+/// @param run 
+/// @param isLogged A variable to check if player logged in successfully or not
+/// @param choice Store choice of a page
+void displayLoginRegisterMenu(savefile &account, string account_file, PlayerInfo players[], char** title, int title_row, int title_col, bool &run, bool &isLogged, int &choice)
+{
+    string username;
+
+    int cellRowSize = 3;
+    int cellColumnSize = 15;
+
+    vector<string> options;
+    options.push_back("LOG IN");
+    options.push_back("REGISTER");
+    options.push_back("QUIT");
+    
+    displayGameTitle(title, title_row, title_col);
+
+    int posX = 15, posY = (WinColumn - cellColumnSize) / 2;
+    for (int i = 0; i < options.size(); i++)
+    {
+        if (choice == i + 1)
+        {
+            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, yellow, black);
+            posX += 4;
+        }
+        else
+        {
+            drawCell(options[i], posX, posY, cellRowSize, cellColumnSize, grey, black);
+            posX += 4;
+        }
+    }
+    char input = getch();
+    input = toupper(input);
+    switch(input)
+    {
+        case 'W':
+            if (choice > 1 )
+                choice --;
+            break;
+        case 'S':
+            if (choice < options.size())
+                choice ++;
+            break;
+        case ' ':
+            if (choice == 1 || choice == 2)
+            {
+                clear();
+                displayGameTitle (title, title_row, title_col);
+                displayForm(account_file, account, players, choice, isLogged);
+            }
+            else
+            {
+                run = false;
+                return;
+            }
+            break;
+    }
+}
+
+void displayForm(string account_file, savefile &account, PlayerInfo players[], int choice, bool &isLogged)
+{
+    string title = "";
+    char temp_name[NAMESIZE];
+    char temp_password[PASSSIZE];
+    if (choice == 1)
+        title = "LOG IN";
+    else
+        title = "REGISTER";
+    int box_size = 20;
+
+    int posX = 15;
+
+    GoTo(posX, (WinColumn - title.length()) / 2);
+    cout << title;
+    
+    GoTo(posX + 4, (WinColumn - 10 - box_size) / 2);
+    cout << "Username: ";
+    drawCell(" ", posX + 3, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
+
+    GoTo(posX + 7, (WinColumn - 10 - box_size) / 2);
+    cout << "Password: ";
+    drawCell(" ", posX + 6, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
+
+    GoTo(posX + 4, (WinColumn - 10 - box_size) / 2 + 12);
+    cin.getline(temp_name, 20);
+
+    GoTo(posX + 7, (WinColumn - 10 - box_size) / 2 + 12);
+    cin.getline(temp_password, 20);
+
+    GoTo(posX + 9, (WinColumn - 50 - box_size) / 2 + 12);
+
+    if (choice == 1)
+        processLogin(account_file, temp_name, temp_password, account, players, isLogged);
+    else
+        processReg(account_file, temp_name, temp_password, account, isLogged, players);
+}
+
 /*
 Page 1 = New Game / Load Game / Account / Leaderboard / Credit / Quit
 Page 2 = Difficulty choice
@@ -12,7 +118,8 @@ Page 9 = Gameplay
 Page 10 = Save game
 */
 
-void generateMenu(savefile &account, GameState &game, PlayerInfo players[], string filename, int &page, int &choice, char** title, int title_row, int title_col, bool &run, bool &continue_game, int &word_count, bool &isLogged, string &bg_file)
+
+void generateMenu(savefile &account, GameState &game, PlayerInfo players[], string account_file, int &page, int &choice, char** title, int title_row, int title_col, bool &run, bool &continue_game, int &word_count, bool &isLogged, string &bg_file)
 {
     char input; 
 
@@ -72,7 +179,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 }
                 else if (choice == 6)
                 {
-                    saveGame(filename, account);
+                    saveGame(account_file, account);
                     isLogged = false;
                     memset(&account, 0, sizeof(account));
                     clear();
@@ -80,7 +187,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 else    //Quit
                 {
                     run = false;
-                    saveGame(filename, account);
+                    saveGame(account_file, account);
                     page = 0;
                 }
                 break;
@@ -230,16 +337,16 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 if (choice == 1) //Change username
                 {
                     bool changed = false;
-                    changeNameForm(account, filename, changed);
+                    changeNameForm(account, account_file, changed);
                     if (changed)
-                        saveGame(filename, account);
+                        saveGame(account_file, account);
                 }
                 else if (choice == 2) //Change Password
                 {   
                     bool changed = false;
                     changePasswordForm(account, changed);
                     if (changed)
-                        saveGame(filename, account);
+                        saveGame(account_file, account);
                 }
                 else    //Return to main menu
                 {
@@ -277,7 +384,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 if (choice == 6) //Save
                 {
                     sortRecord(account.record, 5);
-                    saveGame(filename, account);
+                    saveGame(account_file, account);
                     updateLdBoard(players, account);
                     page = account_page;
                     clear();
@@ -497,7 +604,7 @@ void displayAccountInfo(savefile account)
         cout << "Platinum";
     else if (avg <= 7600)
         cout << "Master";
-    else if (avg <= 9200)
+    else 
         cout << "Challenger";
 }
 
@@ -516,7 +623,7 @@ void displayAccOptions(int choice)
     }
 }
 
-void changeNameForm(savefile &account, string filename, bool &changed)
+void changeNameForm(savefile &account, string account_file, bool &changed)
 {
     clear();
     string title = "Change Usernam";
@@ -543,7 +650,7 @@ void changeNameForm(savefile &account, string filename, bool &changed)
 
     GoTo(9, (WinColumn - 50 - box_size) / 2 + 12);
 
-    ifstream file(filename, ios::binary);
+    ifstream file(account_file, ios::binary);
     if (!file.is_open()) // check if file is opened successfully
     {
         cout << "Error! File cannot be opened.";
@@ -585,11 +692,11 @@ void changePasswordForm(savefile &account, bool &changed)
     cout << title;
     
     GoTo(4, (WinColumn - 10 - box_size) / 2);
-    cout << "Username: ";
+    cout << "Old Password: ";
     drawCell(" ", 3, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
 
     GoTo(7, (WinColumn - 10 - box_size) / 2);
-    cout << "Password: ";
+    cout << "New Password: ";
     drawCell(" ", 6, (WinColumn - 10 - box_size) / 2 + 10, 3, 20);
 
     GoTo(4, (WinColumn - 10 - box_size) / 2 + 12);
@@ -729,11 +836,3 @@ void displayLdBoard(PlayerInfo players[])
     }
 }
 
-int checkNameOnLB(savefile account, PlayerInfo players[])
-{
-    for (int i = 0; i < MAXPLAYERS; i++)
-        if (players[i].name == account.name)
-            return i;
-
-    return -1;
-}

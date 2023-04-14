@@ -1,4 +1,4 @@
-#include "main.h"
+#include "resources.h"
 #include "header.h"
 
 int main()
@@ -21,7 +21,7 @@ int main()
 
     char** title;
     int title_row = 10, title_col = 87;
-    getFileContent("asciiart\\title.txt", title, title_row, title_col);
+    loadArtFromFile("asciiart\\title.txt", title, title_row, title_col);
 
     int word_count = 0;
     int cheatWordsCount[4] = {0};
@@ -80,7 +80,7 @@ int main()
                     }
                 }
 
-                getFileContent(bg_file, background, bg_row, bg_column);
+                loadArtFromFile(bg_file, background, bg_row, bg_column);
                 bg_file = "";
 
                 board_offset_x = (gameboxrow - game.row * (game.cellSize - 1) - 1) / 2 ;
