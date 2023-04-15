@@ -570,8 +570,12 @@ void displayMode(int row, int col, int gamemode, int offSetX, int offSetY)
 
 int main()
 {
+    // Customizable
+    int row = 4, col = 5; 
+    int gamemode = 3;
+    ///////////////////////
+
     int offsetX = 5, offsetY = 10;
-    int row = 4, col = 8, gamemode = 3;
     char** arr;
     make_boardLL(arr, row, col);
                      

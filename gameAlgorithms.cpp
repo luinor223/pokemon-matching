@@ -190,8 +190,8 @@ void drawSelectingPoint(GameState &game, int x, int y, int offset_x, int offset_
 
 
 bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw) // draw == true: hint the player for a possible match
-{                 
-    // Idea: for each element in the board, find cells similar to its character to check for a valid path                                                         // draw == false: only check the possible match
+{                                                                          // draw == false: only check if there is any possible match
+    // Idea: for each element in the board, find cells similar to its character to check for a valid path                                                         
     for (int startX = 0; startX < game.row; startX++)
     {
         for (int startY = 0; startY < game.col; startY++)
