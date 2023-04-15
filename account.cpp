@@ -52,8 +52,6 @@ void processReg(string filename, char* name, char* password, savefile &account, 
         account.position = position;
 
         file.write((char*)&account, sizeof(account));
-        for (int i = 0; i < 5; i++)
-            cout << account.record[i].points << " ";
         cout << "Registration successful! Press any key to continue...";
         getch();
         isLogged = true;

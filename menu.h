@@ -8,7 +8,7 @@ void displayCustomBoardPage(GameState game, int choice);
 void displayLoadGamePage(savefile account, int choice);
 void displayAccountInfo(savefile account);
 void displayAccOptions(int choice);
-void changeNameForm(savefile &account, string filename, bool &changed);
+void changeNameForm(savefile &account, string account_file, PlayerInfo players[], bool &changed);
 void changePasswordForm(savefile &account, string account_file, bool &changed);
 void processHacking(savefile account, int choice);
 bool checkCheatCode(char c, int &count, string cheatCode);

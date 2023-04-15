@@ -374,7 +374,7 @@ void generateMenu(savefile &account, GameState &game, PlayerInfo players[], stri
                 if (choice == 1) //Change username
                 {
                     bool changed = false;
-                    changeNameForm(account, account_file, changed);
+                    changeNameForm(account, account_file, players, changed);
                     if (changed)
                         saveGame(account_file, account);
                     
@@ -687,7 +687,7 @@ void displayAccOptions(int choice)
 
 
 /// @brief display form for name changing
-void changeNameForm(savefile &account, string account_file, bool &changed)
+void changeNameForm(savefile &account, string account_file, PlayerInfo players[], bool &changed)
 {
     clear();
     string title = "Change Username";
@@ -698,19 +698,19 @@ void changeNameForm(savefile &account, string account_file, bool &changed)
     GoTo(0, (WinColumn - title.length()) / 2);
     cout << title;
     
-    GoTo(4, (WinColumn - 14 - box_size) / 2);
+    GoTo(4, (WinColumn - 16 - box_size) / 2);
     cout << "New username: ";
-    drawCell(" ", 3, (WinColumn - 14 - box_size) / 2 + 14, 3, 20);
+    drawCell(" ", 3, (WinColumn - 16 - box_size) / 2 + 16, 3, 20);
 
-    GoTo(7, (WinColumn - 14 - box_size) / 2);
+    GoTo(7, (WinColumn - 16 - box_size) / 2);
     cout << "Password: ";
-    drawCell(" ", 6, (WinColumn - 14 - box_size) / 2 + 14, 3, 20);
+    drawCell(" ", 6, (WinColumn - 16 - box_size) / 2 + 16, 3, 20);
 
     ShowConsoleCursor(true);
-    GoTo(4, (WinColumn - 14 - box_size) / 2 + 16);
+    GoTo(4, (WinColumn - 16 - box_size) / 2 + 18);
     cin.getline(temp_name, 20);
 
-    GoTo(7, (WinColumn - 14 - box_size) / 2 + 16);
+    GoTo(7, (WinColumn - 16 - box_size) / 2 + 18);
     cin.getline(temp_password, 20);
     ShowConsoleCursor(false);
 
@@ -740,6 +740,11 @@ void changeNameForm(savefile &account, string account_file, bool &changed)
     }
     if (changed)
     {
+        int i = checkNameOnLB(account, players);
+        if (i != -1)
+        {
+            players[i].name = temp_name;
+        }
         strcpy(account.name, temp_name);
         saveGame(account_file, account);    //Save to file
         cout << "Changed username successfully. Press any key to go back...";
@@ -760,19 +765,19 @@ void changePasswordForm(savefile &account, string account_file, bool &changed)
     GoTo(0, (WinColumn - title.length()) / 2);
     cout << title;
     
-    GoTo(4, (WinColumn - 14 - box_size) / 2);
+    GoTo(4, (WinColumn - 16 - box_size) / 2);
     cout << "Old Password: ";
-    drawCell(" ", 3, (WinColumn - 14 - box_size) / 2 + 14, 3, 20);
+    drawCell(" ", 3, (WinColumn - 16 - box_size) / 2 + 16, 3, 20);
 
-    GoTo(7, (WinColumn - 14 - box_size) / 2);
+    GoTo(7, (WinColumn - 16 - box_size) / 2);
     cout << "New Password: ";
-    drawCell(" ", 6, (WinColumn - 14 - box_size) / 2 + 14, 3, 20);
+    drawCell(" ", 6, (WinColumn - 16 - box_size) / 2 + 16, 3, 20);
 
     ShowConsoleCursor(true);
-    GoTo(4, (WinColumn - 14 - box_size) / 2 + 16);
+    GoTo(4, (WinColumn - 16 - box_size) / 2 + 18);
     cin.getline(old_password, 20);
 
-    GoTo(7, (WinColumn - 14 - box_size) / 2 + 16);
+    GoTo(7, (WinColumn - 16 - box_size) / 2 + 18);
     cin.getline(new_password, 20);
     ShowConsoleCursor(false);
 
