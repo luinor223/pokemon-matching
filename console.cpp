@@ -53,17 +53,7 @@ void SetScreenBufferSize(SHORT width, SHORT height)
     SetConsoleScreenBufferSize(hStdout, NewSize);
 }
 
-void setBackgroundColor(int color)
-{
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
-    GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
-    WORD currentColor = consoleInfo.wAttributes;
-    WORD backgroundColor = color << 4;
-    SetConsoleTextAttribute(hConsole, currentColor | backgroundColor);
-}
-
-
+//Clear Screen
 void clear()
 {
 	HANDLE                     hStdOut;

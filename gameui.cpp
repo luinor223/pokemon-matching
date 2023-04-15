@@ -83,7 +83,7 @@ void updateUI(GameState &game, int start_time)
     game.time_left = (int)game.total_time - (difftime(current_time, start_time));
 
     GoTo(WinRow - 3, 3);
-    cout << game.time_left << "s";
+    cout << game.time_left << "s ";
     
     if (game.time_left < game.total_time)
     {
@@ -106,6 +106,7 @@ void GameOver(GameState game)
     cout << "Time's up! Your total score is " << game.score;
     GoTo((WinRow - 2)/2 + 1, (WinColumn - 34)/2);
     cout << "Press any key to return to menu...";
+    PlaySound(TEXT("SoundSFX/endgame.wav"), NULL, SND_FILENAME | SND_ASYNC);
     getch();
     clear();
 }

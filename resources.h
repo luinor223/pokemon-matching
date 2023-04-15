@@ -47,7 +47,7 @@ const string Cheat_help = "call911";
 const string Cheat_score = "easygame";
 const string Cheat_time = "bonustime";
 
-const int bouns_time = 60;
+const int bouns_time = 20;
 
 const int main_page = 1;
 const int diff_page = 2;

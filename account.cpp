@@ -90,9 +90,9 @@ void processLogin(string filename, char* name, char* password, savefile &account
             {
                 cout << "Login successful! Press any key to continue...";
                 getch();
-                getLdBoard(players, filename);
-                isLogged = true;
-                account.position = position;
+                getLdBoard(players, filename); //load leaderboard from save file
+                isLogged = true;    
+                account.position = position;    //save the position of the player in the file
                 clear();
                 break;
             }
@@ -108,7 +108,7 @@ void processLogin(string filename, char* name, char* password, savefile &account
     {
         cout << "Username or Password is not correct! Press any key to go back...";
         getch();
-        memset(&account, 0, sizeof(account));
+        memset(&account, 0, sizeof(account));   //Reset account
         clear();
     }
     
@@ -116,6 +116,12 @@ void processLogin(string filename, char* name, char* password, savefile &account
     file.close();  
 }
 
+
+/// @brief Load saved board from account to in-game board
+/// @param game in-game struct
+/// @param account account struct
+/// @param index index of the saved board (0-4)
+/// @param bg_file background file
 void loadBoard(GameState &game, savefile account, int index, string &bg_file) 
 {
     game.row = account.state[index].row;
@@ -130,15 +136,15 @@ void loadBoard(GameState &game, savefile account, int index, string &bg_file)
         game.board[i] = new char[game.col];
         for (int j = 0; j < game.col; j++)
         {
-            game.board[i][j] = account.state[index].board[i*game.col + j] ^ account.mask;  //unmask
+            game.board[i][j] = account.state[index].board[i*game.col + j] ^ account.mask;  //unmask each character of the board;
             if (game.board[i][j] != '\0')
-                game.move_count++;
+                game.move_count++;  
         }
     }
     game.move_count /= 2;
 
-    mask(account.state[index].file_background, account.mask);
-    bg_file = account.state[index].file_background;
+    mask(account.state[index].file_background, account.mask);   //unmask background
+    bg_file = account.state[index].file_background; 
 
     game.time_left = (account.state[index].time_left > 0) ? account.state[index].time_left : 120;
     game.score = account.state[index].score;
@@ -156,7 +162,7 @@ void saveBoard(GameState game, savefile &account, int index)
 
     for (int i = 0; i < game.row; i++)
         for (int j = 0; j < game.col; j++)
-            account.state[index].board[i*game.col + j] = game.board[i][j] ^ account.mask; //mask
+            account.state[index].board[i*game.col + j] = game.board[i][j] ^ account.mask; //mask each character of the board then save
 
     account.state[index].time_left = game.time_left;
     account.state[index].score = game.score;
@@ -167,37 +173,40 @@ void saveBoard(GameState game, savefile &account, int index)
     account.state[index].shuffle_count = game.shuffle_count;
 }
 
+
+/// @brief Get leaderboard from file
 void getLdBoard(PlayerInfo players[], string account_file)
 {
-    ifstream file(account_file, ios::binary);
-    if (!file)
+    ifstream file(account_file, ios::binary);   //Open binary file in read mode
+    if (!file)  //Failed to open file
     {
         cout << "Error, missing " << account_file << ".";
         getch();
         return;
     }
 
-    savefile tempAccount;
-    while(file.read((char*)&tempAccount, sizeof(tempAccount)))
+    savefile tempAccount;   //temporary account
+    while(file.read((char*)&tempAccount, sizeof(tempAccount)))  //scan all the account in the file.
     {
-        mask(tempAccount.name, tempAccount.mask);
+        mask(tempAccount.name, tempAccount.mask);   //Unmask name to display in leaderboard
         updateLdBoard(players, tempAccount);
     }
 
     file.close();
 }
 
+/// @brief Check if the current account's elo is high enough to place on leaderboard and then update it
 void updateLdBoard(PlayerInfo players[], savefile account)
 {
-    if (account.getElo() > players[MAXPLAYERS - 1].elo)
+    if (account.getElo() > players[MAXPLAYERS - 1].elo)     //Check if the elo of an account is higher than the last player on the leaderboard
     {
-        int i =  checkNameOnLB(account, players);
-        if (i != -1)
+        int i =  checkNameOnLB(account, players);   //Check if player's name already in leaderboard
+        if (i != -1)    //If yes, update elo then sort the leaderboard
         {
             players[i].elo = account.getElo();
             sortLB(players);
         }
-        else
+        else    //If no, update the last player then sort the leaderboard
         {
             players[MAXPLAYERS - 1].name = account.name;
             players[MAXPLAYERS - 1].elo = account.getElo();
@@ -208,6 +217,8 @@ void updateLdBoard(PlayerInfo players[], savefile account)
     }
 }
 
+/// @brief Sort Leaderboard
+/// @param arr An array of players infomation to be displayed in leaderboard
 void sortLB(PlayerInfo arr[]) {
     for (int i = 1; i < MAXPLAYERS; i++) {
         PlayerInfo key = arr[i];
@@ -220,6 +231,11 @@ void sortLB(PlayerInfo arr[]) {
     }
 }
 
+
+/// @brief Check if the current account is already on leaderboard
+/// @param account Current account
+/// @param players An array of players infomation to be displayed in leaderboard
+/// @return Index of the account on ldboard if it's already in leaderboard, else return -1.
 int checkNameOnLB(savefile account, PlayerInfo players[])
 {
     for (int i = 0; i < MAXPLAYERS; i++)
@@ -229,20 +245,24 @@ int checkNameOnLB(savefile account, PlayerInfo players[])
     return -1;
 }
 
+
+/// @brief Save the current account struct to file
+/// @param filename Save file's name
+/// @param account current account
 void saveGame(string filename, savefile account)
 {
-    fstream file(filename, ios::binary |ios::in | ios::out); // open file in read and write mode
+    fstream file(filename, ios::binary |ios::in | ios::out); // open binary file in read and write mode 
     if (!file.is_open()) // check if file is opened successfully
     {
         cout << "Error! " << filename << " is missing!";
         getch();
         return;
     }
-    file.seekp(account.position*sizeof(account), ios::beg);
+    file.seekp(account.position*sizeof(account), ios::beg); //Go to the account's position in file 
 
-    mask(account.name, account.mask);
-    mask(account.password, account.mask);
-    file.write((char*)&account, sizeof(account));
+    mask(account.name, account.mask);   //Mask name
+    mask(account.password, account.mask);   //Mask password
+    file.write((char*)&account, sizeof(account));   //Write
 
     file.close();
 }
