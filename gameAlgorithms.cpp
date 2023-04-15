@@ -196,7 +196,9 @@ bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw) // dr
     {
         for (int startY = 0; startY < game.col; startY++)
         {
-            // now compare game.board[startX][startY] to all the rest of the board
+            if (game.board[startX][startY] == '\0') // current cell is empty
+                continue;
+            // now compare game.board[startX][startY] to the rest of the board
             for (int i = 0; i < game.row; i++)
             {
                 for (int j = 0; j < game.col; j++)
