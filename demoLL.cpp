@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "main.h"
+#include "resources.h"
 #include "header.h"
 
 using namespace std;
@@ -269,7 +269,7 @@ void makeLLarrayFromBoard(List* &board, char** a, int row, int col, int mode)
 }
 
 
-void printLL(List board, int x, int y, int mode)
+void printLL(List board, int x, int y, int mode, int offsetX, int offsetY)
 {
     int count = 0;
     Node *it = board.p_head;
@@ -279,7 +279,7 @@ void printLL(List board, int x, int y, int mode)
         {
             string s;
             s = it->key;
-            drawCell(s, x, y + count*(5+3-1), 5, 5+3);
+            drawCell(s, offsetX + x, offsetY + y + count*(5+3-1), 5, 5+3);
             count++;
             it = it->p_next;
         }
@@ -290,7 +290,7 @@ void printLL(List board, int x, int y, int mode)
         {
             string s;
             s = it->key;
-            drawCell(s, x + count*(5-1), y, 5, 5+3);
+            drawCell(s, offsetX + x + count*(5-1), offsetY + y, 5, 5+3);
             count++;
             it = it->p_next;
         }
@@ -301,7 +301,7 @@ void printLL(List board, int x, int y, int mode)
         {
             string s;
             s = it->key;
-            drawCell(s, x, y - count*(5+3-1), 5, 5+3);
+            drawCell(s, offsetX + x, offsetY + y - count*(5+3-1), 5, 5+3);
             count++;
             it = it->p_next;
         }
@@ -312,13 +312,13 @@ void printLL(List board, int x, int y, int mode)
         {
             string s;
             s = it->key;
-            drawCell(s, x - count*(5-1), y, 5, 5+3);
+            drawCell(s, offsetX + x - count*(5-1), offsetY + y, 5, 5+3);
             count++;
             it = it->p_next;
         }
     }
 }
-void print2dLL(List *board, int row, int col, int mode)
+void print2dLL(List *board, int row, int col, int mode, int offSetX, int offSetY)
 {
     // mode = 1 : left indent
     
@@ -326,7 +326,7 @@ void print2dLL(List *board, int row, int col, int mode)
     {
         for (int i = 0; i < row; i++)
         {
-            printLL(board[i], i*(5-1), 0, mode);
+            printLL(board[i], i*(5-1), 0, mode, offSetX, offSetY);
         }
     }
     else if (mode == 2) // mode = 2 : up indent
@@ -334,21 +334,21 @@ void print2dLL(List *board, int row, int col, int mode)
         
         for (int i = 0; i < col; i++)
         {
-           printLL(board[i], 0, i*(5+3-1), mode);
+           printLL(board[i], 0, i*(5+3-1), mode, offSetX, offSetY);
         }
     }
     else if (mode == 3) // right indent
     {
         for (int i = 0; i < row; i++)
         {
-           printLL(board[i], i*(5-1), (col-1)*(5+3-1), mode);
+           printLL(board[i], i*(5-1), (col-1)*(5+3-1), mode, offSetX, offSetY);
         }
     }
     else if (mode == 4) // down indent
     {
         for (int i = 0; i < col; i++)
         {
-           printLL(board[i], (row-1)*(5-1), i*(5+3-1), mode);
+           printLL(board[i], (row-1)*(5-1), i*(5+3-1), mode, offSetX, offSetY);
         }
     }
 }
@@ -381,13 +381,13 @@ void convertPos(PointLL &cur, int row, int col, int mode)
     }
 }
 
-void drawPoint(List* board, PointLL point)
+void drawPoint(List* board, PointLL point, int offSetX, int offSetY)
 {
     if (point.x == -1 && point.y == -1)
         return;
     string content;
     content = getAt(board[point.LL_x], point.LL_y);
-    drawCell(content, point.x*(5-1), point.y*(5+3-1), 5, 5+3, grey, white, 1);
+    drawCell(content, offSetX + point.x*(5-1), offSetY + point.y*(5+3-1), 5, 5+3, grey, white, 1);
 }
 
 
@@ -479,7 +479,7 @@ vector<pair<int, int>> findPathLL(List* board, int row, int col, PointLL cur, Po
 	return res;
 }
 
-void checkMatchingLL(List* board, int row, int col, PointLL &cur, PointLL &selected, int mode)
+void checkMatchingLL(List* board, int row, int col, PointLL &cur, PointLL &selected, int mode, int offsetX, int offsetY)
 {
     if ((selected.x == -1 && selected.y == -1) || (selected.x == cur.x && selected.y == cur.y))
         return;
@@ -507,11 +507,12 @@ void checkMatchingLL(List* board, int row, int col, PointLL &cur, PointLL &selec
         }
         selected.x = -1;
         selected.y = -1;
+        drawMatchingLine(res, offsetX, offsetY, 5);
+        this_thread::sleep_for(200ms);
     }
-
 }
 
-void playerInput(List* board, PointLL &cur, PointLL &selected, int row, int col, int mode, bool &run)
+void playerInput(List* board, PointLL &cur, PointLL &selected, int row, int col, int mode, bool &run, int offsetX, int offsetY)
 {
     char c = getch();
     int x = 0, y = 0;
@@ -536,7 +537,7 @@ void playerInput(List* board, PointLL &cur, PointLL &selected, int row, int col,
         }
         else if (selected.x != -1 && selected.y != -1)
         {
-            checkMatchingLL(board, row, col, cur, selected, mode);
+            checkMatchingLL(board, row, col, cur, selected, mode, offsetX, offsetY);
         }
         else
             selected = cur;
@@ -551,11 +552,26 @@ void playerInput(List* board, PointLL &cur, PointLL &selected, int row, int col,
         cur.y += y;
     }
 }
+void displayMode(int row, int col, int gamemode, int offSetX, int offSetY)
+{
+    string indentMode = "Current gamemode: ";
 
+    if (gamemode == 1)
+        indentMode += "left indent";
+    else if (gamemode == 2)
+        indentMode += "up indent";
+    else if (gamemode == 3)
+        indentMode += "right indent";
+    else
+        indentMode += "down indent";
+
+    drawCell(indentMode, offSetX + 0, offSetY + (col+1)*8, 5, indentMode.length() + 3);
+}
 
 int main()
 {
-    int row = 6, col = 4, gamemode = 4;
+    int offsetX = 5, offsetY = 10;
+    int row = 4, col = 8, gamemode = 3;
     char** arr;
     make_boardLL(arr, row, col);
                      
@@ -574,12 +590,12 @@ int main()
         system("cls");
         convertPos(cur, row, col, gamemode);
         convertPos(selected, row, col, gamemode);
-        print2dLL(board, row, col, gamemode);  
+        print2dLL(board, row, col, gamemode, offsetX, offsetY);  
 
-        drawPoint(board, cur);
-        drawPoint(board, selected);
-        
-        playerInput(board, cur, selected, row, col, gamemode, run);
+        drawPoint(board, cur, offsetX, offsetY);
+        drawPoint(board, selected, offsetX, offsetY);
+        displayMode(row, col, gamemode, offsetX, offsetY);
+        playerInput(board, cur, selected, row, col, gamemode, run, offsetX, offsetY);
         
             
     }

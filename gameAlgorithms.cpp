@@ -86,10 +86,10 @@ bool checkMatching(GameState game, char** background, int bg_row, int bg_column,
 
     string temp;
     temp = game.board[s.x][s.y];
-    drawCell(temp, offset_x + s.x*(game.cellSize-1), offset_y + s.y*(game.cellSize + 2), game.cellSize, game.cellSize + 3); // deselecting start cell
+    drawCell(temp, offset_x + s.x*(game.cellSize - 1), offset_y + s.y*(game.cellSize + 2), game.cellSize, game.cellSize + 3); // deselecting starting cell
     
     temp = game.board[f.x][f.y];
-    drawCell(temp, offset_x + f.x*(game.cellSize  - 1), offset_y + f.y*(game.cellSize + 2), game.cellSize, game.cellSize + 3); // deselecting end cell
+    drawCell(temp, offset_x + f.x*(game.cellSize  - 1), offset_y + f.y*(game.cellSize + 2), game.cellSize, game.cellSize + 3); // deselecting ending cell
 
     if (game.board[s.x][s.y] != game.board[f.x][f.y]) // different character
     {
@@ -100,20 +100,21 @@ bool checkMatching(GameState game, char** background, int bg_row, int bg_column,
     vector <pair<int, int>> res;
     res = findPath(game, s.x, s.y, f.x, f.y);
 
-    if (res.size() <= 4 && res.size() >= 2) // valid
+    if (res.size() <= 4 && res.size() >= 2) // valid path
     {
-        
+        // show matching line
         drawMatchingLine(res, offset_x, offset_y, game.cellSize);
         this_thread::sleep_for(200ms);
 
+        // delete both cell
         game.board[s.x][s.y] = '\0';
         game.board[f.x][f.y] = '\0';
-        setBoard(game); // thụt lùi theo gameMode
+
+        setBoard(game); // indent mode
 
         selectedPoint.clear();
         return true;
     }
-
     selectedPoint.clear();
     return false;
 }
@@ -188,23 +189,26 @@ void drawSelectingPoint(GameState &game, int x, int y, int offset_x, int offset_
 }
 
 
-bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw)
-{
+bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw) // draw == true: hint the player for a possible match
+{                 
+    // Idea: for each element in the board, find cells similar to its character to check for a valid path                                                         // draw == false: only check the possible match
     for (int startX = 0; startX < game.row; startX++)
     {
         for (int startY = 0; startY < game.col; startY++)
         {
+            // now compare game.board[startX][startY] to all the rest of the board
             for (int i = 0; i < game.row; i++)
             {
                 for (int j = 0; j < game.col; j++)
                 {
-                    if (i == startX && j == startY)
+                    if (i == startX && j == startY) // currently checking the same cell
                         continue;
-                    if (game.board[startX][startY] != game.board[i][j])
+                    if (game.board[startX][startY] != game.board[i][j]) // 2 cells have different character
                         continue;
-                    if (game.board[i][j] == '\0')
+                    if (game.board[i][j] == '\0') // empty cell
                         continue;
 
+                    // if not all of the above, check the path between 2 cell
                     vector <pair <int, int> > res;
                     res = findPath(game, startX, startY, i, j);
 
@@ -214,8 +218,9 @@ bool moveSuggestion(GameState game, int offset_x, int offset_y, bool draw)
                         temp1 = game.board[startX][startY];
                         temp2 = game.board[i][j];
 
-                        if (draw == true)
+                        if (draw == true) 
                         {
+                            // highlight the cells with green color
                             drawCell(temp1, offset_x + startX*game.cellSize - startX, offset_y + startY*(game.cellSize + 3) - startY, game.cellSize, game.cellSize + 3, 10, 0);
                             drawCell(temp2, offset_x + i*game.cellSize - i, offset_y + j*(game.cellSize + 3) - j, game.cellSize, game.cellSize + 3, 10, 0);
                         }
